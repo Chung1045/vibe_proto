@@ -1,0 +1,130 @@
+[
+  {
+    "voteId": "1234567890",
+    "authorUid": "1234567890",
+    "dateModified": "2019-01-01T00:00:00.000Z",
+    "voteTitle": "Which is your favourite programming languages?",
+    "voteOptions": [
+      {
+        "id": "1",
+        "name": "C++"
+      },
+      {
+        "id": "2",
+        "name": "Java"
+      },
+      {
+        "id": "3",
+        "name": "Python"
+      }
+    ]
+  },
+  {
+    "voteId": "234567890",
+    "authorUid": "1234567890",
+    "dateModified": "2019-01-01T00:00:00.000Z",
+    "voteTitle": "Which is your favourite programming languages?",
+    "voteOptions": [
+      {
+        "id": "1",
+        "name": "C++"
+      },
+      {
+        "id": "2",
+        "name": "Java"
+      },
+      {
+        "id": "3",
+        "name": "Python"
+      }
+    ]
+  },
+  {
+    "voteId": "234567890",
+    "authorUid": "1234567890",
+    "dateModified": "2019-01-01T00:00:00.000Z",
+    "voteTitle": "Which is your favourite programming languages?",
+    "voteOptions": [
+      {
+        "id": "1",
+        "name": "C++"
+      },
+      {
+        "id": "2",
+        "name": "Java"
+      },
+      {
+        "id": "3",
+        "name": "Python"
+      },
+      {
+        "id": "4",
+        "name": "C"
+      },
+      {
+        "id": "5",
+        "name": "JavaScript"
+      }
+    ]
+  },
+  {
+    "voteId": "234567890",
+    "authorUid": "1234567890",
+    "dateModified": "2019-01-01T00:00:00.000Z",
+    "voteTitle": "Which is your favourite programming languages?",
+    "voteOptions": [
+      {
+        "id": "1",
+        "name": "C++"
+      },
+      {
+        "id": "2",
+        "name": "Java"
+      },
+      {
+        "id": "3",
+        "name": "Python"
+      }
+    ]
+  },
+  {
+    "voteId": "234567890",
+    "authorUid": "1234567890",
+    "dateModified": "2019-01-01T00:00:00.000Z",
+    "voteTitle": "Which is your favourite programming languages?",
+    "voteOptions": [
+      {
+        "id": "1",
+        "name": "C++"
+      },
+      {
+        "id": "2",
+        "name": "Java"
+      },
+      {
+        "id": "3",
+        "name": "Python"
+      }
+    ]
+  },
+  {
+    "voteId": "234567890",
+    "authorUid": "1234567890",
+    "dateModified": "2019-01-01T00:00:00.000Z",
+    "voteTitle": "Which is your favourite programming languages?",
+    "voteOptions": [
+      {
+        "id": "1",
+        "name": "C++"
+      },
+      {
+        "id": "2",
+        "name": "Java"
+      },
+      {
+        "id": "3",
+        "name": "Python"
+      }
+    ]
+  }
+]

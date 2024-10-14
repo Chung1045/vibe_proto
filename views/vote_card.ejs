@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Young+Serif&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <!-- Ensure app.css is loaded after Bootstrap to override its styles -->
+    <link rel="stylesheet" href="/stylesheets/app.css">
+    <title>Document</title>
+</head>
+<body>
+<h2>This is a h2</h2>
+<p>This is a paragraph</p>
+<section id="section_voteCard_container" style="opacity: 0">
+    <div id="container">
+    <% for (let vote of voteData) { %>
+        <div class="card" id="vote_card" data-vote-id="<%= vote.voteId %>">
+            <h2 id="text_voteTitle_h2"><%= vote.voteTitle %></h2>
+            <% for (let voteOptions of vote.voteOptions) { %>
+                <p class="text_voteOptions_p" data-option-id="<%= voteOptions.id %>"><%= voteOptions.name %></p>
+            <% } %>
+        </div>
+    <% } %>
+    </div>
+</section>
+
+<script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+<script src="https://unpkg.com/imagesloaded@5/imagesloaded.pkgd.min.js"></script>
+<script src="/public/javascripts/voteUtils.js"></script>
+<script type="module">
+    // This one is for enable resizing the cards when window is resized
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var container = document.querySelector('#container');
+        var msnry;
+
+        function initMasonry() {
+            if (msnry) {
+                msnry.destroy();
+            }
+
+            var containerWidth = container.offsetWidth;
+            var cardWidth = 400; // Fixed card width
+            var gutter = 20; // Gutter width
+            var columns = Math.floor((containerWidth + gutter) / (cardWidth + gutter));
+            columns = Math.min(Math.max(columns, 1), 4); // Ensure between 1 and 4 columns
+
+            msnry = new Masonry(container, {
+                itemSelector: '.card',
+                columnWidth: cardWidth,
+                gutter: gutter,
+                fitWidth: true
+            });
+
+            // Set the container width to fit the columns exactly
+            container.style.width = (columns * (cardWidth + gutter) - gutter) + 'px';
+
+            msnry.layout();
+        }
+
+        // Initialize Masonry after all images have loaded
+        imagesLoaded(container, function() {
+            initMasonry();
+            // Fade in the content
+            document.querySelector('#section_voteCard_container').style.opacity = '1';
+        });
+
+        // Relayout Masonry on window resize
+        var resizeTimer;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(initMasonry, 250);
+        });
+
+        // Select all elements with the class 'text_voteOptions_p'
+        const options = document.querySelectorAll('.text_voteOptions_p');
+
+// Loop through each option
+        options.forEach(option => {
+            // Add a click event listener to each option
+            function clickHandler() {
+                const parentId = this.parentElement.getAttribute('data-vote-id');
+                const optionId = this.getAttribute('data-option-id');
+                this.classList.add('clicked_selected');
+                alert(`You are now on VoteID ${parentId}\nYou clicked option ${optionId}`);
+
+                // Remove listeners from all sibling elements
+                option.removeEventListener('click', clickHandler);
+                option.forEach(sibling => {
+                    sibling.removeEventListener('click', clickHandler);
+                });
+            }
+
+            option.addEventListener("click", clickHandler);
+        });
+
+    });
+</script>
+
+</body>
+</html>
