@@ -7,8 +7,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Young+Serif&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
-          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
     <!-- Ensure app.css is loaded after Bootstrap to override its styles -->
     <link rel="stylesheet" href="/stylesheets/app.css">
     <title>Document</title>
@@ -17,14 +26,14 @@
 <%- include('navbar') %>
 <section id="section_voteCard_container" style="opacity: 0">
     <div id="container">
-    <% for (let vote of voteData) { %>
-        <div class="card" id="vote_card" data-vote-id="<%= vote.voteId %>">
-            <h2 id="text_voteTitle_h2"><%= vote.voteTitle %></h2>
-            <% for (let voteOptions of vote.voteOptions) { %>
-                <p class="text_voteOptions_p" data-option-id="<%= voteOptions.id %>"><%= voteOptions.name %></p>
-            <% } %>
-        </div>
-    <% } %>
+        <% for (let vote of voteData) { %>
+            <div class="card" id="vote_card" data-vote-id="<%= vote.voteId %>">
+                <h2 id="text_voteTitle_h2"><%= vote.voteTitle %></h2>
+                <% for (let voteOptions of vote.voteOptions) { %>
+                    <p class="text_voteOptions_p" data-option-id="<%= voteOptions.id %>" data-vote-id="<%= vote.voteId %>"><%= voteOptions.name %></p>
+                <% } %>
+            </div>
+        <% } %>
     </div>
 </section>
 
@@ -34,7 +43,7 @@
 <script type="module">
     // This one is for enable resizing the cards when window is resized
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         var container = document.querySelector('#container');
         var msnry;
 
@@ -63,7 +72,7 @@
         }
 
         // Initialize Masonry after all images have loaded
-        imagesLoaded(container, function() {
+        imagesLoaded(container, function () {
             initMasonry();
             // Fade in the content
             document.querySelector('#section_voteCard_container').style.opacity = '1';
@@ -71,34 +80,55 @@
 
         // Relayout Masonry on window resize
         var resizeTimer;
-        window.addEventListener('resize', function() {
+        window.addEventListener('resize', function () {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(initMasonry, 250);
         });
 
-        // Select all elements with the class 'text_voteOptions_p'
-        const options = document.querySelectorAll('.text_voteOptions_p');
-
-// Loop through each option
-        options.forEach(option => {
-            // Add a click event listener to each option
-            function clickHandler() {
-                const parentId = this.parentElement.getAttribute('data-vote-id');
-                const optionId = this.getAttribute('data-option-id');
-                this.classList.add('clicked_selected');
-                alert(`You are now on VoteID ${parentId}\nYou clicked option ${optionId}`);
-
-                // Remove listeners from all sibling elements
-                option.removeEventListener('click', clickHandler);
-                option.forEach(sibling => {
-                    sibling.removeEventListener('click', clickHandler);
-                });
-            }
-
-            option.addEventListener("click", clickHandler);
-        });
-
     });
+
+    //
+    // I found it difficult to move the logic to external file, so I will write here instead.
+    //
+
+    // Function to handle click event
+    function clickHandler() {
+        const voteID = this.parentElement.getAttribute('data-vote-id');
+        const optionId = this.getAttribute('data-option-id');
+        this.classList.add('clicked_selected');
+        alert(`You are now on VoteID ${voteID}\nYou clicked option ${optionId}`);
+
+        // Disable listeners for all options
+        disableListeners(voteID);
+    }
+
+    // Function to disable all click event listeners
+    function disableListeners(voteID) {
+        // Find all <p> elements that have the same data-vote-id attribute
+        const options = document.querySelectorAll(`.text_voteOptions_p[data-vote-id="${voteID}"]`);
+
+        // Remove click event listeners from all matching elements
+        options.forEach(option => {
+            option.removeEventListener('click', clickHandler);
+        });
+    }
+
+
+    // Add event listeners to all options
+    function initializeListeners() {
+        const options = document.querySelectorAll('.text_voteOptions_p');
+        options.forEach(option => {
+            option.addEventListener('click', clickHandler);
+        });
+    }
+
+    // Initialize event listeners when the page is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+        initializeListeners();
+    });
+
+
+
 </script>
 
 </body>
