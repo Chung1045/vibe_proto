@@ -17,29 +17,6 @@ app.use(express.json()); // To parse incoming JSON in POST request body
 app.use(methodOverride('_method')); // To 'fake' put/patch/delete requests
 app.use(express.static(path.join(__dirname, 'public')));
 
-let comments = [
-    {
-        id: uuid(),
-        username: 'Todd',
-        comment: 'lol that is so funny!'
-    },
-    {
-        id: uuid(),
-        username: 'Skyler',
-        comment: 'I like to go birdwatching with my dog'
-    },
-    {
-        id: uuid(),
-        username: 'Sk8erBoi',
-        comment: 'Plz delete your account, Todd'
-    },
-    {
-        id: uuid(),
-        username: 'onlysayswoof',
-        comment: 'woof woof woof'
-    }
-];
-
 function readJsonFileSync(filepath, encoding) {
 
     if (typeof (encoding) == 'undefined') {
@@ -55,37 +32,25 @@ function getConfig(file) {
     return readJsonFileSync(filepath);
 }
 
-
 userData = getConfig('public/data/user.json');
-console.log(userData);
 
 voteData = getConfig('public/data/vote.json');
-console.log(voteData);
 
-
-app.get("/home", (req, res) => {
-    res.render("home", {comments});
-});
-
-app.get("/view1", (req, res) => {
-    res.render("view1");
-});
-
-app.get("/editor", (req, res) => {
-    res.render("editor");
+app.get("/dashboard", (req, res) => {
+    res.render("dashboard");
 });
 
 app.get("/login", (req, res) => {
     res.render("login");
 });
 
-app.get("/vote_card", (req, res) => {
-    res.render("vote_card", {voteData});
+app.get("/navbar", (req, res) => {
+    res.render("navbar");
 });
 
 // Fallback route should be placed at the end
 app.get("*", (req, res) => {
-    res.render("home", {comments});
+    res.render("index", {voteData});
 });
 
 app.listen(port, () => {
