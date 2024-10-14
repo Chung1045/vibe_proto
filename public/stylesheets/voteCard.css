@@ -39,12 +39,13 @@
 }
 
 .text_voteOptions_p.clicked_selected {
-    background-color: #00b8b8;
-    color: #2d2d2d;
+    background-color: #756DD6;
+    color: #f5f5f5;
 }
 
 .text_voteOptions_p.clicked_not_selected {
-    background-color: #858585;
+    background-color: #919191;
+    color: #2d2d2d;
 }
 
 #section_voteCard_container {

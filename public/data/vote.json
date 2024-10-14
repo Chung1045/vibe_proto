@@ -23,107 +23,103 @@
     "voteId": "234567890",
     "authorUid": "1234567890",
     "dateModified": "2019-01-01T00:00:00.000Z",
-    "voteTitle": "Which is your favourite programming languages?",
+    "voteTitle": "Chocolate or white chocolate?",
     "voteOptions": [
       {
         "id": "1",
-        "name": "C++"
+        "name": "Chocolate"
       },
       {
         "id": "2",
-        "name": "Java"
-      },
-      {
-        "id": "3",
-        "name": "Python"
+        "name": "White Chocolate"
       }
     ]
   },
   {
-    "voteId": "234567890",
+    "voteId": "334567890",
     "authorUid": "1234567890",
     "dateModified": "2019-01-01T00:00:00.000Z",
-    "voteTitle": "Which is your favourite programming languages?",
+    "voteTitle": "Help decide which laptop to purchase",
     "voteOptions": [
       {
         "id": "1",
-        "name": "C++"
+        "name": "Surface Laptop 7"
       },
       {
         "id": "2",
-        "name": "Java"
+        "name": "MacBook Air M3 13\""
       },
       {
         "id": "3",
-        "name": "Python"
+        "name": "Galaxy Book 4 Pro"
       },
       {
         "id": "4",
-        "name": "C"
+        "name": "Asus ZenBook S 14"
       },
       {
         "id": "5",
-        "name": "JavaScript"
+        "name": "Lenovo IdeaPad Slim 7x"
       }
     ]
   },
   {
-    "voteId": "234567890",
+    "voteId": "434567890",
     "authorUid": "1234567890",
     "dateModified": "2019-01-01T00:00:00.000Z",
-    "voteTitle": "Which is your favourite programming languages?",
+    "voteTitle": "Try to make them all 25%!",
     "voteOptions": [
       {
         "id": "1",
-        "name": "C++"
+        "name": "A"
       },
       {
         "id": "2",
-        "name": "Java"
+        "name": "B"
       },
       {
         "id": "3",
-        "name": "Python"
+        "name": "C"
       }
     ]
   },
   {
-    "voteId": "234567890",
+    "voteId": "534567890",
     "authorUid": "1234567890",
     "dateModified": "2019-01-01T00:00:00.000Z",
-    "voteTitle": "Which is your favourite programming languages?",
+    "voteTitle": "What character to cosplay?",
     "voteOptions": [
       {
         "id": "1",
-        "name": "C++"
+        "name": "Blah Blah Blah"
       },
       {
         "id": "2",
-        "name": "Java"
+        "name": "Blah Blah Blah"
       },
       {
         "id": "3",
-        "name": "Python"
+        "name": "Blah Blah Blah"
       }
     ]
   },
   {
-    "voteId": "234567890",
+    "voteId": "634567890",
     "authorUid": "1234567890",
     "dateModified": "2019-01-01T00:00:00.000Z",
-    "voteTitle": "Which is your favourite programming languages?",
+    "voteTitle": "Who is the most handsome guy?",
     "voteOptions": [
       {
         "id": "1",
-        "name": "C++"
+        "name": "Chung"
       },
       {
         "id": "2",
-        "name": "Java"
+        "name": "Thomas"
       },
       {
         "id": "3",
-        "name": "Python"
+        "name": "Ezeamuzie"
       }
     ]
   }
