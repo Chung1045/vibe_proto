@@ -80,6 +80,10 @@
       {
         "id": "3",
         "name": "C"
+      },
+      {
+        "id": "4",
+        "name": "D"
       }
     ]
   },
@@ -120,6 +124,74 @@
       {
         "id": "3",
         "name": "Ezeamuzie"
+      }
+    ]
+  },
+  {
+    "voteId": "734567890",
+    "authorUid": "1234567890",
+    "dateModified": "2019-01-01T00:00:00.000Z",
+    "voteTitle": "Which rhythm game music composer makes you fear??",
+    "voteOptions": [
+      {
+        "id": "1",
+        "name": "Camelia"
+      },
+      {
+        "id": "2",
+        "name": "Laur"
+      },
+      {
+        "id": "3",
+        "name": "Sakuzyo"
+      },
+      {
+        "id": "4",
+        "name": "Slientroom"
+      }
+    ]
+  },
+  {
+    "voteId": "834567890",
+    "authorUid": "1234567890",
+    "dateModified": "2019-01-01T00:00:00.000Z",
+    "voteTitle": "Which browser you prefer?",
+    "voteOptions": [
+      {
+        "id": "1",
+        "name": "Chrome"
+      },
+      {
+        "id": "2",
+        "name": "Edge"
+      },
+      {
+        "id": "3",
+        "name": "Firefox"
+      },
+      {
+        "id": "4",
+        "name": "Opera"
+      },
+      {
+        "id": "5",
+        "name": "Safari"
+      },
+      {
+        "id": "6",
+        "name": "Brave"
+      },
+      {
+        "id": "7",
+        "name": "Vivaldi"
+      },
+      {
+        "id": "8",
+        "name": "Yandex"
+      },
+      {
+        "id": "9",
+        "name": "Arc Browser"
       }
     ]
   }
