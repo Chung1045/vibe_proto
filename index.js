@@ -44,6 +44,11 @@ app.get("/login", (req, res) => {
     res.render("login");
 });
 
+app.get("/Register", (req, res) => {
+    res.render("Register");
+});
+
+
 app.get("/navbar", (req, res) => {
     res.render("navbar");
 });
