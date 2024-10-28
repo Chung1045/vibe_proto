@@ -1,0 +1,15 @@
+#div_container_action_button img{
+    margin-right: 15px;
+    padding: 5px;
+    border-radius: 8px;
+    color: whitesmoke;
+    fill: whitesmoke;
+}
+
+#div_container_action_button img:last-child{
+    margin-right: 0;
+}
+
+#div_container_action_button img:hover{
+    background-color: #bab9b9;
+}

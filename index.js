@@ -16,6 +16,7 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.json()); // To parse incoming JSON in POST request body
 app.use(methodOverride('_method')); // To 'fake' put/patch/delete requests
 app.use(express.static(path.join(__dirname, 'public')));
+app.use("/stylesheets", express.static('public/stylesheets'));
 
 function readJsonFileSync(filepath, encoding) {
 

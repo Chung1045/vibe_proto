@@ -18,8 +18,10 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
             integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
             crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!-- Ensure voteCard.css is loaded after Bootstrap to override its styles -->
     <link rel="stylesheet" href="/stylesheets/voteCard.css">
+    <link rel="stylesheet" href="/stylesheets/dashboard.css">
     <title>Document</title>
 </head>
 <body>
@@ -32,6 +34,10 @@
                 <% for (let voteOptions of vote.voteOptions) { %>
                     <p class="text_voteOptions_p" data-option-id="<%= voteOptions.id %>" data-vote-id="<%= vote.voteId %>"><%= voteOptions.name %></p>
                 <% } %>
+                <div class="d-flex justify-content-end" id="div_container_action_button">
+                    <img src="/images/icns/trash-fill.svg" alt="icon">
+                    <img src="/images/icns/pencil-square.svg" alt="icon">
+                </div>
             </div>
         <% } %>
     </div>
@@ -93,48 +99,48 @@
 
     // Function to handle click event
     function clickHandler() {
-        const voteID = this.parentElement.getAttribute('data-vote-id');
-        const optionID = this.getAttribute('data-option-id');
-        alert(`You are now on VoteID ${voteID}\nYou clicked option ${optionID}`);
-
-        // Disable listeners for all options with the same voteID
-        disableListeners(voteID, optionID);
+        // const voteID = this.parentElement.getAttribute('data-vote-id');
+        // const optionID = this.getAttribute('data-option-id');
+        // alert(`You are now on VoteID ${voteID}\nYou clicked option ${optionID}`);
+        //
+        // // Disable listeners for all options with the same voteID
+        // disableListeners(voteID, optionID);
     }
 
     // Function to disable all click event listeners for siblings
-    function disableListeners(voteID, clickedOptionID) {
-        // Find all <p> elements that have the same data-vote-id attribute
-        const options = document.querySelectorAll(`.text_voteOptions_p[data-vote-id="${voteID}"]`);
-
-        // Remove click event listeners from all matching elements
-        options.forEach(option => {
-            const optionID = option.getAttribute('data-option-id');
-
-            if (optionID === clickedOptionID) {
-                // Add 'clicked_selected' class to the clicked option
-                option.classList.add('clicked_selected');
-            } else {
-                // Add 'clicked_not_selected' class to all siblings that weren't clicked
-                option.classList.add('clicked_not_selected');
-            }
-
-            // Disable the click event listener
-            option.removeEventListener('click', clickHandler);
-        });
-    }
-
-    // Add event listeners to all options
-    function initializeListeners() {
-        const options = document.querySelectorAll('.text_voteOptions_p');
-        options.forEach(option => {
-            option.addEventListener('click', clickHandler);
-        });
-    }
-
-    // Initialize event listeners when the page is loaded
-    document.addEventListener('DOMContentLoaded', () => {
-        initializeListeners();
-    });
+    // function disableListeners(voteID, clickedOptionID) {
+    //     // Find all <p> elements that have the same data-vote-id attribute
+    //     const options = document.querySelectorAll(`.text_voteOptions_p[data-vote-id="${voteID}"]`);
+    //
+    //     // Remove click event listeners from all matching elements
+    //     options.forEach(option => {
+    //         const optionID = option.getAttribute('data-option-id');
+    //
+    //         if (optionID === clickedOptionID) {
+    //             // Add 'clicked_selected' class to the clicked option
+    //             option.classList.add('clicked_selected');
+    //         } else {
+    //             // Add 'clicked_not_selected' class to all siblings that weren't clicked
+    //             option.classList.add('clicked_not_selected');
+    //         }
+    //
+    //         // Disable the click event listener
+    //         option.removeEventListener('click', clickHandler);
+    //     });
+    // }
+    //
+    // // Add event listeners to all options
+    // function initializeListeners() {
+    //     const options = document.querySelectorAll('.text_voteOptions_p');
+    //     options.forEach(option => {
+    //         option.addEventListener('click', clickHandler);
+    //     });
+    // }
+    //
+    // // Initialize event listeners when the page is loaded
+    // document.addEventListener('DOMContentLoaded', () => {
+    //     initializeListeners();
+    // });
 
 
 
