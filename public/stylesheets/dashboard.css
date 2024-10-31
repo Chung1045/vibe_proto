@@ -13,3 +13,54 @@
 #div_container_action_button img:hover{
     background-color: #bab9b9;
 }
+
+.editable_title {
+    margin-right: 15px;
+    padding: 10px 15px;
+    border-radius: 8px;
+    outline: 2px solid #666666;
+    color: #2d2d2d;
+    font-size: 20px;
+    font-family: "Young Serif", serif;
+    transition: 0.2s;
+}
+
+.editable_title:focus{
+    font-weight: bold;
+    outline: 4px solid #756DD6;
+}
+
+.editable_options {
+    color: #666666;
+    font-size: 16px;
+    font-family: "Inter", sans-serif;
+    outline: 2px solid #666666;
+    border-radius: 8px;
+    padding: 15px;
+    transition: 0.25s;
+}
+
+.editable_options:focus{
+    font-weight: bold;
+    outline: 4px solid #756DD6;
+}
+
+.editable_addOptions {
+    color: #666666;
+    font-size: 16px;
+    font-family: "Inter", sans-serif;
+    outline: 2px solid #666666;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 0 0 15px 0;
+    transition: 0.25s;
+}
+
+.editable_hr {
+    width: 100%; /* Ensures hr takes full width */
+    height: 2px; /* Set a height for a thicker line */
+    margin: 0 15px 15px 15px; /* Add vertical spacing; adjust as needed */
+    background-color: #666666; /* Set color */
+    border: none; /* Remove default border */
+    box-sizing: border-box; /* Ensure padding is included in width */
+}
