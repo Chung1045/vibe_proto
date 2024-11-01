@@ -7,11 +7,17 @@ $(document).ready(function(){
         fitWidth: true
     });
 
+    $(document).on('click', '#btn-delete', function(){
+        let voteEntry = $(this).closest('.card');
+        let voteID = voteEntry.attr('data-vote-id');
+        $('#ModalDialogue').modal('show');
+        $('#btn-modal-confirm').data('vote-id', voteID).data('action', 'delete');
+    });
+
     $(document).on('click', '#btn-edit', function(){
         let parentElement = $(this).closest('.card');
         let voteID = parentElement.attr('data-vote-id');
 
-        //<div class="card" id="vote_card" data-vote-id="<%= vote.voteId %>">
         const editButton = parentElement.find('#btn-edit');
         const title = parentElement.find(`#text_voteTitle_h2[data-vote-id="${voteID}"]`);
         const options = parentElement.find(`.text_voteOptions_p[data-vote-id="${voteID}"]`);
@@ -71,4 +77,16 @@ $(document).ready(function(){
             $grid.masonry('layout'); // Recalculate layout
         });
     });
+
+    $(document).on('click', '#btn-modal-confirm', function(){
+        let voteID = $(this).data('vote-id'); // Retrieve voteID from data attribute
+        if (voteID !== undefined) {
+            if ($(this).data('action') === 'delete') {
+                let voteEntry = document.querySelector(`.card[data-vote-id="${voteID}"]`);
+                $(voteEntry).remove();
+                $grid.masonry('layout');
+            }
+        }
+    });
+
 });
