@@ -14,32 +14,53 @@ $(document).ready(function(){
         $('#btn-modal-confirm').data('vote-id', voteID).data('action', 'delete');
     });
 
+    $(document).on('click', '.editable_addOptions', function(){
+        let parentElement = $(this).closest('.card');
+        let voteID = parentElement.attr('data-vote-id');
+
+        // Find the options list within the card
+        const optionsList = parentElement.find(`#vote_option_list[data-vote-id="${voteID}"]`);
+
+        // Create the new editable option
+        let newOption = $('<div contenteditable />').addClass('editable_options').text('New option');
+
+        // Append the new option to the options list
+        optionsList.append(newOption);
+
+        // Trigger Masonry layout to adjust the new card size
+        $grid.masonry('layout');
+
+        // Handle input for the new option
+        newOption.on('input', function() {
+            $grid.masonry('layout'); // Recalculate layout when input changes
+        });
+    });
+
     $(document).on('click', '#btn-edit', function(){
         let parentElement = $(this).closest('.card');
         let voteID = parentElement.attr('data-vote-id');
 
         const editButton = parentElement.find('#btn-edit');
         const title = parentElement.find(`#text_voteTitle_h2[data-vote-id="${voteID}"]`);
-        const options = parentElement.find(`.text_voteOptions_p[data-vote-id="${voteID}"]`);
+        const optionsList = parentElement.find(`#vote_option_list[data-vote-id="${voteID}"]`);
+        const options = optionsList.find(`.text_voteOptions_p[data-vote-id="${voteID}"]`);
 
-        $("<p>Title</p>").insertBefore($(title));
-        $("<p>Options</p>").insertBefore($(options).first());
-        // Create a div for editable options and append it after the parentElement
-        $('<div/>').text("Add new options").addClass("editable_addOptions").insertAfter($(options).last());
+        // Add labels
+        $("<p>Title</p>").insertBefore(title);
+        $("<p>Options</p>").insertBefore(optionsList);
 
-        // Create a horizontal rule and append it after the parentElement
-        $("<hr>").addClass("editable_hr").insertAfter($(options).last());
-        $(editButton).attr('src', '/images/icns/check2.svg');
+        // Create options editing container
+        let divEditOptions = $("<div/>").addClass("div-edit-options");
+        let newOptionsBt = $('<div/>').text("Add new options").addClass("editable_addOptions");
+        let horizontalRule = $('<hr/>').addClass("editable_hr");
 
+        // Make title editable
         let titleText = title.text();
         let originalClasses = title.attr('class');
         let originalStyles = title.attr('style');
         let originalMargin = title.css('margin');
 
-         // Create <div> element for the title
         let textareaElement = $('<div contenteditable />').text(titleText);
-
-        // Replace <h2> with <div> and preserve styling
         title.replaceWith(textareaElement);
         textareaElement.attr('class', originalClasses)
             .attr('style', originalStyles)
@@ -47,34 +68,41 @@ $(document).ready(function(){
             .addClass('editable_title')
             .css({'display': 'block', 'width': '100%'});
 
-        // Handle options
+        // Make options editable
         options.each(function() {
             let currentText = $(this).text();
             let originalStyles = $(this).attr('style');
             let originalMargin = $(this).css('margin');
+            let optionId = $(this).attr('data-option-id');
 
-            // Create <div> element for each option
             let inputElement = $('<div contenteditable />').text(currentText);
-
-            // Replace <p> with input field and preserve styling
-            $(this).replaceWith(inputElement);
             inputElement.attr('class', 'editable_options')
                 .attr('style', originalStyles)
                 .css('margin', originalMargin)
+                .attr('data-option-id', optionId)
+                .attr('data-vote-id', voteID)
                 .css({'display': 'block'});
+
+            $(this).replaceWith(inputElement);
         });
 
-        // Trigger Masonry layout after changes
+        // Append the "Add new options" button after the options list
+        divEditOptions.append(horizontalRule, newOptionsBt);
+        optionsList.after(divEditOptions);
+
+        // Change edit button icon
+        editButton.attr('src', '/images/icns/check2.svg');
+
+        // Update Masonry layout
         $grid.masonry('layout');
 
-        // Handle input events to adjust Masonry layout
+        // Handle input events for dynamic layout
         textareaElement.on('input', function() {
-            $grid.masonry('layout'); // Recalculate layout
+            $grid.masonry('layout');
         });
 
-        // Handle input for options
         parentElement.find('.editable_options').on('input', function() {
-            $grid.masonry('layout'); // Recalculate layout
+            $grid.masonry('layout');
         });
     });
 
