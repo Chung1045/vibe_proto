@@ -8,7 +8,11 @@
     <title>Vibe</title>
     <link href="https://fonts.googleapis.com/css?family=Young+Serif&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Inter&display=swap" rel="stylesheet" />
-    <link href="/stylesheets/Login.css" rel="stylesheet" />
+    <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+  />
+      <link href="/stylesheets/Login.css" rel="stylesheet" />
 </head>
 <body>
     <div class="login-container">
@@ -16,10 +20,16 @@
         <h2 class="subtitle">Login</h2>
         <form action="#nowhere" class="login-form">
             <div class="form-group">
-                <input type="text" id="input_userName" placeholder="Email or Username">
+                <input type="text" id="input_userName" placeholder=" ">
+                <label for="input_userName">Email or Username</label>
+
             </div>
             <div class="form-group">
-                <input type="password" id="input_password" placeholder="Password">
+                <input type="password" name="password" id="input_password" placeholder=" ">
+                <label for="input_password">Password</label>
+                <span class="eye-icon" id="togglePassword">
+                    <i class="fa fa-eye" id="eyeIcon"></i>
+                </span>
             </div>
             <div class="form-group">
                 <a href="" class="forgot-credentials">Forget Credentials?</a>
@@ -32,5 +42,31 @@
             </div>
         </form>
     </div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const togglePassword = document.getElementById('togglePassword');
+    const password = document.getElementById('input_password');
+    const eyeIcon = document.getElementById('eyeIcon');
+
+    togglePassword.addEventListener('click', function(e) {
+        // Prevent the form from submitting
+        e.preventDefault();
+        
+        // Toggle the type attribute
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+        
+        // Toggle the eye icon
+        if (type === 'password') {
+            eyeIcon.className = 'fa fa-eye';
+        } else {
+            eyeIcon.className = 'fa fa-eye-slash';
+        }
+    });
+});
+</script>
+
 </body>
 </html>

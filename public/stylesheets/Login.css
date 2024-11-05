@@ -36,17 +36,16 @@ body {
     color: #666;
 }
 
-.login-form .form-group {
-    margin-bottom: 20px;
-}
-
 .login-form input {
     width: 95%;
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid #ababab;
     border-radius: 5px;
     font-size: 16px;
     font-family: 'Inter', sans-serif;
+    transition: border-color 0.3s ease; /* Smooth transition */
+    color: #6b72e1; /* Set default text color */
+    background: transparent; /* Transparent background */
 }
 
 .login-form .forgot-credentials {
@@ -71,4 +70,64 @@ body {
     color: #6b72e1;
     text-decoration: none;
     font-size: 14px;
+}
+
+
+.login-form .form-group {
+    margin-bottom: 20px;
+    position: relative; /* Needed for label positioning */
+}
+
+.login-form input {
+    width: 95%; /* Adjusted width */
+    padding: 10px;
+    border: 1px solid #ababab;
+    border-radius: 5px;
+    font-size: 16px;
+    font-family: 'Inter', sans-serif;
+    transition: border-color 0.3s ease; /* Smooth transition */
+    color: #6b72e1; /* Input text color */
+    background: transparent; /* Transparent background */
+    top: 3px; /* Move label up */
+
+}
+
+/* Label styles for floating effect */
+.login-form label {
+    position: absolute;
+    left: 10px; /* Adjust as needed */
+    top: 12px; /* Adjusted default position for better alignment */
+    color: #ababab; /* Default label color */
+    font-size: 16px; /* Same as input font size */
+    transition: 0.2s; /* Smooth transition */
+}
+
+
+/* Reduce font size of input text when focused */
+.login-form input:focus {
+    font-size: 16px; /* Smaller input text size on focus */
+    bottom: -10px;
+}
+
+/* Shrink the label when input is focused */
+.login-form input:focus + label,
+.login-form input:not(:placeholder-shown) + label {
+    top: 0.9px; /* Move label up */
+    left: 10px; /* Keep label aligned */
+    font-size: 11px; /* Smaller font size */
+    color: #6b72e1; /* Change color */
+}
+
+/* Hide the placeholder text */
+.login-form input::placeholder {
+    color: transparent; /* Hide the placeholder */
+}
+
+.eye-icon {
+    position: absolute;
+    right: 10px; /* Adjust the position */
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer; /* Pointer on hover */
+    color: #000000; /* Eye icon color */
 }
