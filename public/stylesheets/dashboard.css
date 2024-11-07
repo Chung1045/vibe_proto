@@ -27,23 +27,19 @@
 
 .editable_title:focus{
     font-weight: bold;
-    outline: 4px solid #756DD6;
 }
 
 .editable_options {
+    flex-grow: 1; /* Make the option text take up available space */
     color: #666666;
     font-size: 16px;
     font-family: "Inter", sans-serif;
-    outline: 2px solid #666666;
-    border-radius: 8px;
-    margin-top: 15px;
-    padding: 15px;
-    transition: 0.25s;
 }
 
 .editable_options:focus{
     font-weight: bold;
-    outline: 4px solid #756DD6;
+    outline: none;
+    transition: 0.2s ease-in;
 }
 
 .editable_addOptions {
@@ -63,6 +59,8 @@
     background-color: #666666; /* Set color */
     border: none; /* Remove default border */
     box-sizing: border-box; /* Ensure padding is included in width */
+    margin-bottom: 10px;
+    margin-top: 0;
 }
 
 #btn-fab-createVote {
@@ -92,4 +90,30 @@
 
 .div-edit-options {
     align-content: center;
+}
+
+.option-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px; /* Add space between options */
+    padding: 15px; /* Apply padding here */
+    border-radius: 8px; /* Round the corners of the wrapper */
+    outline: 2px solid #666666; /* Border around the wrapper */
+    transition: 0.25s;
+}
+
+.option-wrapper:hover {
+    outline: 4px solid #756DD6; /* Change border color on hover */
+}
+
+.option-wrapper:focus-within {
+    outline: 4px solid #756DD6; /* Change border color on focus */
+}
+
+.delete-option-icon {
+    width: 16px; /* Adjust the size of the icon */
+    height: 16px;
+    cursor: pointer;
+    margin-left: 10px; /* Add space between the text and the delete icon */
 }
