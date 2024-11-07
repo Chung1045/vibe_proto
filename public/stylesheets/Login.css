@@ -64,7 +64,15 @@ body {
     font-size: 16px;
     cursor: pointer;
     font-family: 'Inter', sans-serif;
+    transition: 0.5s;
 }
+
+.login-form .login-button:hover {
+    opacity: 1;
+    background-color: #3543ff;
+    color: #ffffff;
+}
+
 
 .login-form .sign-up {
     color: #6b72e1;
@@ -100,6 +108,7 @@ body {
     color: #ababab; /* Default label color */
     font-size: 16px; /* Same as input font size */
     transition: 0.2s; /* Smooth transition */
+    pointer-events: none;
 }
 
 
@@ -107,11 +116,12 @@ body {
 .login-form input:focus {
     font-size: 16px; /* Smaller input text size on focus */
     bottom: -10px;
+
 }
 
 /* Shrink the label when input is focused */
-.login-form input:focus + label,
-.login-form input:not(:placeholder-shown) + label {
+.login-form input:focus ~ label,
+.login-form input:not(:placeholder-shown) ~ label {
     top: 0.9px; /* Move label up */
     left: 10px; /* Keep label aligned */
     font-size: 11px; /* Smaller font size */
