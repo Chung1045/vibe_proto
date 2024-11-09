@@ -44,6 +44,14 @@ function checkOptionsCount(optionsList) {
     }
 }
 
+function setElementVisibility(element, isVisible) {
+    if (isVisible) {
+        element.style.display = 'block';
+    } else {
+        element.style.display = 'none';
+    }
+}
+
 describe('checkOptionsCount', () => {
     it('should hide delete buttons when there are fewer than 3 options', () => {
         const optionsList = $('#vote_option_list');
