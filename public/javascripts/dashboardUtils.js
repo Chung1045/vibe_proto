@@ -98,6 +98,54 @@ $(document).ready(function () {
         }
     });
 
+    // $(document).on('click', '#btn-save-changes', function () {
+    //     const card = $(this).closest('.card');
+    //     const voteID = card.attr('data-vote-id');
+    //
+    //     // Collect edited data
+    //     const newTitle = card.find('.editable_title').text();
+    //     const newOptions = card.find('.editable_options').map(function() {
+    //         return $(this).text();
+    //     }).get();
+    //
+    //     // Update title
+    //     card.find('p:contains("Title")').remove();
+    //     const titleElement = $('<h2>').attr({
+    //         'id': 'text_voteTitle_h2',
+    //         'data-vote-id': voteID
+    //     }).text(newTitle);
+    //     card.find('.editable_title').replaceWith(titleElement);
+    //
+    //     // Update options
+    //     const optionsList = card.find(`#vote_option_list[data-vote-id="${voteID}"]`);
+    //     optionsList.empty();
+    //     card.find('p:contains("Options")').remove();
+    //     newOptions.forEach((option, index) => {
+    //         const optionElement = $('<p>').addClass('text_voteOptions_p')
+    //             .attr({
+    //                 'data-vote-id': voteID,
+    //                 'data-option-id': index + 1
+    //             })
+    //             .text(option);
+    //         optionsList.append(optionElement);
+    //     });
+    //
+    //     // Remove edit-related elements
+    //     card.find('.div-edit-options').remove();
+    //     card.find('.delete-option-icon').remove();
+    //
+    //     // Change save button back to edit button
+    //     $(this).attr({
+    //         'src': '/images/icns/pencil-square.svg',
+    //         'id': 'btn-edit'
+    //     });
+    //
+    //     // Recalculate Masonry layout
+    //     $('#container').masonry('layout');
+    //     extractVoteCardData(voteID);
+    //     saveVoteData(voteID);
+    // });
+
     $(document).on('click', '#btn-save-changes', function () {
         const card = $(this).closest('.card');
         const voteID = card.attr('data-vote-id');
@@ -142,9 +190,45 @@ $(document).ready(function () {
 
         // Recalculate Masonry layout
         $('#container').masonry('layout');
-        extractVoteCardData(voteID);
-        saveVoteData(voteID);
+
+        // Extract and save vote data
+        const voteData = extractVoteCardData(card);
+        saveVoteData(voteData);
     });
+
+    function extractVoteCardData(card) {
+        const voteID = card.attr('data-vote-id');
+        const title = card.find('#text_voteTitle_h2').text();
+        const options = card.find('.text_voteOptions_p').map(function() {
+            return {
+                id: $(this).attr('data-option-id'),
+                text: $(this).text()
+            };
+        }).get();
+
+        return {
+            voteId: voteID,
+            voteTitle: title,
+            voteOptions: options
+        };
+    }
+
+    function saveVoteData(voteData) {
+        $.ajax({
+            url: '/api/vote/update',
+            method: 'POST',
+            data: JSON.stringify(voteData),
+            contentType: 'application/json',
+            success: function(response) {
+                console.log('Vote updated successfully:', response);
+                // You can add a visual feedback here, like a toast notification
+            },
+            error: function(xhr, status, error) {
+                console.error('Error updating vote:', error);
+                // You can add error handling here, like showing an error message to the user
+            }
+        });
+    }
 
     // Function to add a new editable option
     function addNewOption(optionsList) {
