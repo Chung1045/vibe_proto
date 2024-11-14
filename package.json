@@ -5,6 +5,7 @@
   "scripts": {
     "test": "vitest"
   },
+  "type": "module",
   "private": true,
   "author": "",
   "license": "ISC",

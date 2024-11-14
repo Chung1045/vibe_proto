@@ -1,18 +1,12 @@
-const fs = require('fs');
-const path = require('path');
-const { v4: uuid } = require('uuid');
+import fs from 'fs';
+import path from 'path';
+import { v4 as uuid } from 'uuid';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // ===== File Operations =====
-
-function readJsonFileSync(filepath, encoding = 'utf8') {
-    const file = fs.readFileSync(filepath, encoding);
-    return JSON.parse(file);
-}
-
-async function getConfig(file) {
-    const filepath = path.join(__dirname, '..', '..', file);
-    return readJsonFileSync(filepath);
-}
 
 async function saveToVoteDatabase() {
     const filepath = path.join(__dirname, '..', '..', 'public/data/vote.json');
@@ -37,16 +31,26 @@ async function writeJsonFile(filepath, data) {
     });
 }
 
-let userData, voteData, voteRecords;
-
-async function initializeData() {
-    userData = await getConfig('public/data/user.json');
-    voteData = await getConfig('public/data/vote.json');
-    voteRecords = await getConfig('public/data/voteRecord.json');
+function readJsonFileSync(filepath, encoding) {
+    if (typeof (encoding) == 'undefined') {
+        encoding = 'utf8';
+    }
+    var file = fs.readFileSync(filepath, encoding);
+    return JSON.parse(file);
 }
 
-// Call this function at the beginning of your script
-initializeData().catch(console.error);
+function getConfig(file) {
+    var filepath = path.join(__dirname, '..', '..', file);
+    return readJsonFileSync(filepath);
+}
+
+const userData = getConfig('public/data/user.json');
+const voteData = getConfig('public/data/vote.json');
+const voteRecords = getConfig('public/data/voteRecord.json');
+
+async function getVoteData() {
+    return voteData;
+}
 
 // ===== Vote Operations =====
 
@@ -472,7 +476,9 @@ async function checkCredentials(username, password) {
     }
 }
 
-module.exports = {
+// Replace the module.exports at the end of the file with this:
+
+export {
     searchUser,
     getUserUID,
     checkCredentials,
@@ -491,10 +497,6 @@ module.exports = {
     saveToUserDatabase,
     saveToVoteDatabase,
     saveToVoteRecordDatabase,
-    getConfig,
-    readJsonFileSync,
     rearrangeVoteJSONEntry,
-    voteData,
-    voteRecords,
-    userData
-}
+    getVoteData
+};

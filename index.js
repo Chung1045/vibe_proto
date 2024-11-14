@@ -1,12 +1,15 @@
-const path = require('path');
-const methodOverride = require('method-override');
-const {v4: uuid} = require('uuid');
-const express = require('express');
-const fs = require('fs');
-const app = express();
-const session = require('cookie-session');
-// const voteUtils = require("./public/javascripts/voteUtils");
+import path from 'path';
+import methodOverride from 'method-override';
+import { v4 as uuid } from 'uuid';
+import express from 'express';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import * as databaseHelper from './public/javascripts/databaseHelper.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const app = express();
 const port = 6060;
 
 // Views folder and EJS setup:
@@ -19,8 +22,14 @@ app.use(methodOverride('_method')); // To 'fake' put/patch/delete requests
 app.use(express.static(path.join(__dirname, 'public')));
 app.use("/stylesheets", express.static('public/stylesheets'));
 
-app.get("/dashboard", (req, res) => {
-    res.render("dashboard");
+app.get("/dashboard", async (req, res) => {
+    try {
+        const voteData = await databaseHelper.getVoteData();
+        res.render("dashboard", { voteData: voteData });
+    } catch (error) {
+        console.error("Error fetching vote data:", error);
+        res.status(500).send("Error fetching vote data");
+    }
 });
 
 app.get("/login", (req, res) => {
@@ -32,20 +41,16 @@ app.get("/navbar", (req, res) => {
 });
 
 // Fallback route should be placed at the end
-app.get("*", (req, res) => {
-    res.render("index", {voteData});
+app.get("*", async (req, res) => {
+    try {
+        const voteData = await databaseHelper.getVoteData();
+        res.render("index", { voteData: voteData });
+    } catch (error) {
+        console.error("Error fetching vote data:", error);
+        res.status(500).send("Error fetching vote data");
+    }
 });
-
-app.post('/api/create-or-update-vote', async (req, res) => {
-    res.json({success: true});
-});
-
-
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
-
-
-
-
