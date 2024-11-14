@@ -1,8 +1,10 @@
-[{
-  "uid": "1234567890",
-  "username": "Chung",
-  "password": "1234567890",
-  "email": "chung@example.com",
-  "phoneNum": "0912345678",
-  "profilePicURL": null
-}]
+[
+  {
+    "uid": "1234567890",
+    "username": "ChungSat",
+    "password": "1234567890",
+    "email": "chung@example.com",
+    "phoneNum": "0912345678",
+    "profilePicURL": null
+  }
+]

@@ -4,6 +4,7 @@ const {v4: uuid} = require('uuid');
 const express = require('express');
 const fs = require('fs');
 const app = express();
+const session = require('cookie-session');
 // const voteUtils = require("./public/javascripts/voteUtils");
 
 const port = 6060;
@@ -17,25 +18,6 @@ app.use(express.json()); // To parse incoming JSON in POST request body
 app.use(methodOverride('_method')); // To 'fake' put/patch/delete requests
 app.use(express.static(path.join(__dirname, 'public')));
 app.use("/stylesheets", express.static('public/stylesheets'));
-
-function readJsonFileSync(filepath, encoding) {
-
-    if (typeof (encoding) == 'undefined') {
-        encoding = 'utf8';
-    }
-    var file = fs.readFileSync(filepath, encoding);
-    return JSON.parse(file);
-}
-
-function getConfig(file) {
-
-    var filepath = __dirname + '/' + file;
-    return readJsonFileSync(filepath);
-}
-
-userData = getConfig('public/data/user.json');
-
-voteData = getConfig('public/data/vote.json');
 
 app.get("/dashboard", (req, res) => {
     res.render("dashboard");
@@ -54,6 +36,16 @@ app.get("*", (req, res) => {
     res.render("index", {voteData});
 });
 
+app.post('/api/create-or-update-vote', async (req, res) => {
+    res.json({success: true});
+});
+
+
+
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
+
+
+
+

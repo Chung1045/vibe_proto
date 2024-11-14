@@ -2,20 +2,16 @@
   {
     "voteId": "1234567890",
     "authorUid": "1234567890",
-    "dateModified": "2019-01-01T00:00:00.000Z",
-    "voteTitle": "Which is your favourite programming languages?",
+    "dateModified": "2024-11-14T12:24:09.425Z",
+    "voteTitle": "Updated Vote Title",
     "voteOptions": [
       {
         "id": "1",
-        "name": "C++"
+        "name": "New Option 1"
       },
       {
         "id": "2",
-        "name": "Java"
-      },
-      {
-        "id": "3",
-        "name": "Python"
+        "name": "New Option 2"
       }
     ]
   },
@@ -192,6 +188,214 @@
       {
         "id": "9",
         "name": "Arc Browser"
+      }
+    ]
+  },
+  {
+    "voteId": "26685f38-2855-45f1-9c9c-dbdce39a0ad9",
+    "authorUid": "Hi",
+    "dateModified": "2024-11-14T15:18:03.939Z",
+    "voteTitle": "Updated Vote Title",
+    "voteOptions": [
+      {
+        "id": "1",
+        "name": "New Option 1"
+      },
+      {
+        "id": "2",
+        "name": "New Option 2"
+      }
+    ]
+  },
+  {
+    "voteId": "003f5dbd-fa94-4c06-bf1e-2725bcbbed2b",
+    "authorUid": "Hi",
+    "dateModified": "2024-11-14T16:04:50.718Z",
+    "voteTitle": "Updated Vote Title",
+    "voteOptions": [
+      {
+        "id": "1",
+        "name": "New Option 1"
+      },
+      {
+        "id": "2",
+        "name": "New Option 2"
+      }
+    ]
+  },
+  {
+    "voteId": "5667bc4f-df71-4028-bec1-ab99d0707fd3",
+    "authorUid": "Hi",
+    "dateModified": "2024-11-14T16:05:16.002Z",
+    "voteTitle": "Updated Vote Title",
+    "voteOptions": [
+      {
+        "id": "1",
+        "name": "New Option 1"
+      },
+      {
+        "id": "2",
+        "name": "New Option 2"
+      }
+    ]
+  },
+  {
+    "voteId": "501d90b4-57fb-4fd3-a868-ce564a4fe235",
+    "authorUid": "Hi",
+    "dateModified": "2024-11-14T16:05:24.432Z",
+    "voteTitle": "Updated Vote Title",
+    "voteOptions": [
+      {
+        "id": "1",
+        "name": "New Option 1"
+      },
+      {
+        "id": "2",
+        "name": "New Option 2"
+      }
+    ]
+  },
+  {
+    "voteId": "515bba84-6819-4ed8-b841-eebd84bf59b1",
+    "authorUid": "Hi",
+    "dateModified": "2024-11-14T16:05:43.633Z",
+    "voteTitle": "Updated Vote Title",
+    "voteOptions": [
+      {
+        "id": "1",
+        "name": "New Option 1"
+      },
+      {
+        "id": "2",
+        "name": "New Option 2"
+      }
+    ]
+  },
+  {
+    "voteId": "c5c940b3-40b5-4d8b-b662-ab915b0ea35f",
+    "authorUid": "Hi",
+    "dateModified": "2024-11-14T16:06:20.853Z",
+    "voteTitle": "Updated Vote Title",
+    "voteOptions": [
+      {
+        "id": "1",
+        "name": "New Option 1"
+      },
+      {
+        "id": "2",
+        "name": "New Option 2"
+      }
+    ]
+  },
+  {
+    "voteId": "ae9d8cbd-8a5d-4ac6-8534-23c520a05408",
+    "authorUid": "Hi",
+    "dateModified": "2024-11-14T16:35:48.630Z",
+    "voteTitle": "Test Vote",
+    "voteOptions": [
+      {
+        "id": "1",
+        "name": "Option 1"
+      },
+      {
+        "id": "2",
+        "name": "Option 2"
+      }
+    ]
+  },
+  {
+    "voteId": "20f001f3-54b0-44dc-bb96-c8e6a593954d",
+    "authorUid": "Hi",
+    "dateModified": "2024-11-14T16:35:48.632Z",
+    "voteTitle": "Updated Test Vote",
+    "voteOptions": [
+      {
+        "id": "1",
+        "name": "Updated Option 1"
+      },
+      {
+        "id": "2",
+        "name": "Updated Option 2"
+      },
+      {
+        "id": "3",
+        "name": "New Option 3"
+      }
+    ]
+  },
+  {
+    "voteId": "fcb70ee9-452a-41c6-9ea6-8dc96db161ea",
+    "authorUid": "Hi",
+    "dateModified": "2024-11-14T16:36:35.919Z",
+    "voteTitle": "Test Vote",
+    "voteOptions": [
+      {
+        "id": "1",
+        "name": "Option 1"
+      },
+      {
+        "id": "2",
+        "name": "Option 2"
+      }
+    ]
+  },
+  {
+    "voteId": "02822dd9-0630-4682-8dac-aee2021acd81",
+    "authorUid": "Hi",
+    "dateModified": "2024-11-14T16:36:35.923Z",
+    "voteTitle": "Updated Test Vote",
+    "voteOptions": [
+      {
+        "id": "1",
+        "name": "Updated Option 1"
+      },
+      {
+        "id": "2",
+        "name": "Updated Option 2"
+      },
+      {
+        "id": "3",
+        "name": "New Option 3"
+      }
+    ]
+  },
+  {
+    "voteId": "7f4c70ce-f626-45bb-a4c0-a17b8cdc5aac",
+    "authorUid": "Hi",
+    "dateModified": "2024-11-14T17:05:13.412Z",
+    "voteTitle": "Test Vote for Statistics",
+    "voteOptions": [
+      {
+        "id": "1",
+        "text": "Option 1"
+      },
+      {
+        "id": "2",
+        "text": "Option 2"
+      },
+      {
+        "id": "3",
+        "text": "Option 3"
+      }
+    ]
+  },
+  {
+    "voteId": "32c6a361-534e-494b-92ff-b1b087abd0be",
+    "authorUid": "Hi",
+    "dateModified": "2024-11-14T17:07:08.456Z",
+    "voteTitle": "Test Vote for Statistics",
+    "voteOptions": [
+      {
+        "id": "1",
+        "text": "Option 1"
+      },
+      {
+        "id": "2",
+        "text": "Option 2"
+      },
+      {
+        "id": "3",
+        "text": "Option 3"
       }
     ]
   }

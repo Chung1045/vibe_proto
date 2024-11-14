@@ -28,19 +28,19 @@ $(document).ready(function () {
     $(document).on('click', '#btn-fab-createVote', function () {
         let containerView = $('#container');
 
+
         const newCardStruct = $(`
-    <div class="card" id="vote_card" data-vote-id="1234567890" style="position: absolute; left: 20px; top: 20px;">
-        <p>Title</p><div contenteditable="" class="editable_title" style="margin: 0px 0px 15px; display: block; width: 100%;">Which is your favourite programming languages?</div>
+    <div class="card" id="vote_card" data-vote-id="new-temporarily" data-creation-type="new" style="position: absolute; left: 20px; top: 20px;">
+        <p>Title</p><div contenteditable="" class="editable_title" style="margin: 0px 0px 15px; display: block; width: 100%;">Write your Vote Title here</div>
         <p>Options</p>
-        <div id="vote_option_list" data-vote-id="1234567890">
-            <div class="option-wrapper"><div contenteditable="" class="editable_options" data-option-id="1" data-vote-id="1234567890" style="display: block;">C++</div><img src="/images/icns/trash-fill.svg" class="delete-option-icon"></div>
-            <div class="option-wrapper"><div contenteditable="" class="editable_options" data-option-id="2" data-vote-id="1234567890" style="display: block;">Java</div><img src="/images/icns/trash-fill.svg" class="delete-option-icon"></div>
-            <div class="option-wrapper"><div contenteditable="" class="editable_options" data-option-id="3" data-vote-id="1234567890" style="display: block;">Python</div><img src="/images/icns/trash-fill.svg" class="delete-option-icon"></div>
+        <div id="vote_option_list" data-vote-id="new-temporarily">
+            <div class="option-wrapper"><div contenteditable="" class="editable_options" data-option-id="1" data-vote-id="new-temporarily" style="display: block;">Option 1</div></div>
+            <div class="option-wrapper"><div contenteditable="" class="editable_options" data-option-id="2" data-vote-id="new-temporarily" style="display: block;">Option 2</div></div>
         </div>
         <div class="div-edit-options"><hr class="editable_hr"><div class="editable_addOptions">Add new options</div></div>
         <div class="d-flex justify-content-end" id="div_container_action_button">
             <img src="/images/icns/trash-fill.svg" alt="icon" id="btn-delete">
-            <img src="/images/icns/check2.svg" alt="icon" id="btn-edit">
+            <img src="/images/icns/check2.svg" alt="icon" id="btn-save-changes">
         </div>
     </div>
     `);
@@ -96,6 +96,54 @@ $(document).ready(function () {
                 $grid.masonry('layout');
             }
         }
+    });
+
+    $(document).on('click', '#btn-save-changes', function () {
+        const card = $(this).closest('.card');
+        const voteID = card.attr('data-vote-id');
+
+        // Collect edited data
+        const newTitle = card.find('.editable_title').text();
+        const newOptions = card.find('.editable_options').map(function() {
+            return $(this).text();
+        }).get();
+
+        // Update title
+        card.find('p:contains("Title")').remove();
+        const titleElement = $('<h2>').attr({
+            'id': 'text_voteTitle_h2',
+            'data-vote-id': voteID
+        }).text(newTitle);
+        card.find('.editable_title').replaceWith(titleElement);
+
+        // Update options
+        const optionsList = card.find(`#vote_option_list[data-vote-id="${voteID}"]`);
+        optionsList.empty();
+        card.find('p:contains("Options")').remove();
+        newOptions.forEach((option, index) => {
+            const optionElement = $('<p>').addClass('text_voteOptions_p')
+                .attr({
+                    'data-vote-id': voteID,
+                    'data-option-id': index + 1
+                })
+                .text(option);
+            optionsList.append(optionElement);
+        });
+
+        // Remove edit-related elements
+        card.find('.div-edit-options').remove();
+        card.find('.delete-option-icon').remove();
+
+        // Change save button back to edit button
+        $(this).attr({
+            'src': '/images/icns/pencil-square.svg',
+            'id': 'btn-edit'
+        });
+
+        // Recalculate Masonry layout
+        $('#container').masonry('layout');
+        extractVoteCardData(voteID);
+        saveVoteData(voteID);
     });
 
     // Function to add a new editable option
@@ -160,6 +208,7 @@ $(document).ready(function () {
 
         // Change edit button icon
         editButton.attr('src', '/images/icns/check2.svg');
+        editButton.attr('id', 'btn-save-changes');
 
         // Check and update delete button visibility
         checkOptionsCount(optionsList);
