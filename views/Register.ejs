@@ -6,9 +6,13 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Vibe</title>
-    <link href="https://fonts.googleapis.com/css?family=Young+Serif&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css?family=Inter&display=swap" rel="stylesheet" />
-    <link href="/stylesheets/Register.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Young+Serif&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css?family=Inter&display=swap" rel="stylesheet"/>
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+    <link href="/stylesheets/Register.css" rel="stylesheet"/>
+    <script src="public/javascripts/registerUtils.js"></script>
 </head>
 <body>
 
@@ -17,19 +21,37 @@
     <h2 class="subtitle">Register</h2>
     <form action="#nowhere" class="register-form">
         <div class="form-group">
-            <input type="text" id="input_userName" placeholder="Email or Username">
+            <input type="text" id="input_email" placeholder="Email address">
+            <label for="input_email">Email address</label>
+        </div>
+        <div class="form-group">
+            <input type="text" id="input_userName" placeholder="Username">
+            <label for="input_userName">Username</label>
+        </div>
+        <div class="form-group">
+            <input type="text" id="input_phoneNumber" placeholder="Phone number">
+            <label for="input_phoneNumber">Phone number</label>
         </div>
         <div class="form-group">
             <input type="password" id="input_password" placeholder="Password">
+            <label for="input_password">Password</label>
+            <span class="eye-icon" id="togglePassword">
+                    <i class="fa fa-eye" id="eyeIcon"></i>
+                </span>
+        </div>
+        <div class="form-group">
+            <input type="password" id="input_confirmPassword" placeholder="Confirm Password">
+            <label for="input_confirmPassword">Confirm Password</label>
+            <span class="eye-icon" id="togglePassword">
+                    <i class="fa fa-eye" id="eyeIcon"></i>
+                </span>
         </div>
         <div class="form-group">
             <a href="/login">Already have account?</a>
         </div>
         <div class="form-group">
             <button type="submit" id="btn-register" class="register_button">Register</button>
-    </div>
         </div>
-        
     </form>
 </div>
 

@@ -1,10 +1,10 @@
 import path from 'path';
 import methodOverride from 'method-override';
-import {v4 as uuid} from 'uuid';
 import express from 'express';
 import cookieSession from "cookie-session"
 import {fileURLToPath} from 'url';
 import * as databaseHelper from './public/javascripts/databaseHelper.js';
+import {voteForOptions} from "./public/javascripts/databaseHelper.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,7 +24,7 @@ app.use("/stylesheets", express.static('public/stylesheets'));
 
 app.use(cookieSession({
     name: 'session',
-    keys: ['sdkfhkdshfkjhdksfjhghsjdfgkjhfadskjgh'],
+    keys: ['8ddee61f-3694-4bb8-8750-5ef7f0076614'],
     // Cookie Options
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
@@ -40,15 +40,27 @@ app.get("/dashboard", async (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-    res.render("login");
+    if (req.session.authenticated) {
+        res.redirect("/index");
+    } else {
+        res.render("login");
+    }
 });
 
-app.get("/Register", (req, res) => {
-    res.render("Register");
+app.get("/register", (req, res) => {
+    if (req.session.authenticated) {
+        res.redirect("/index");
+    } else {
+        res.render("Register");
+    }
 });
 
 app.get("/navbar", (req, res) => {
     res.render("navbar");
+});
+
+app.get("/settings", (req, res) => {
+    res.render("settings");
 });
 
 app.post("/api/user/check-credentials", async (req, res) => {
@@ -168,18 +180,37 @@ app.post("/api/user/logout", async (req, res) => {
 
 app.post("/api/vote/vote-for-options", async (req, res) => {
     if (req.session.authenticated) {
+        try {
+            // Extract userUID from session, and voteID and voteOptionID from the request body
+            const userUID = req.session.uid;
+            const { voteID, voteOptionID } = req.body;
 
+            // Validate input
+            if (!voteID || !voteOptionID) {
+                return res.status(400).json({ error: "Invalid voteID or voteOptionID" });
+            }
+
+            // Call the voteForOptions function to register the vote
+            const updatedVoteRecord = await voteForOptions(userUID, voteID, voteOptionID);
+
+            // Send a success response with the updated vote record
+            res.status(200).json({ message: "Vote recorded successfully", updatedVoteRecord });
+        } catch (err) {
+            console.error("Error in voteForOptions:", err);
+            res.status(500).json({ error: err.message });
+        }
     } else {
-        res.redirect("/login");
+        res.status(401).json({ error: "Unauthorized. Please log in." });
     }
 });
+
 
 app.post("/api/vote/update", async (req, res) => {
     const voteData = req.body;
     console.log("voteData", voteData);
 
     try {
-        const updatedVote = await databaseHelper.updateVote(voteData.voteId, voteData);
+        const updatedVote = await databaseHelper.updateVote(req.session.uid, voteData.voteId, voteData);
         res.json({success: true, message: "Vote saved successfully", vote: updatedVote});
     } catch (error) {
         console.error("Error updating vote:", error);
