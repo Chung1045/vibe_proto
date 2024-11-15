@@ -64,11 +64,19 @@ async function updateVote(voteID, newVoteData) {
         console.log("Search result: ", vote);
         if (!vote) {
             console.log(`Vote with ID ${voteID} not found. Inserting new vote entry...`);
-            return await insertNewVote(voteID, newVoteData);
+
+            if (voteID === "new-temporarily"){
+                console.log("Detected new vote entry. Creating a new vote record with new voteID");
+                return await insertNewVote(uuid(), newVoteData);
+            } else {
+                return await insertNewVote(voteID, newVoteData);
+            }
+
         } else {
             Object.assign(vote, newVoteData);
             vote.dateModified = new Date().toISOString();
             await saveToVoteDatabase();
+            await initVoteRecord(voteID);
             return vote;
         }
     } catch (err) {
@@ -466,8 +474,9 @@ async function checkCredentials(username, password) {
     if (user) {
         if (user.password === password) {
             console.log("Credentials are valid.");
-            console.log("UserID is", await getUserUID(username));
-            return user;
+            const uid = await getUserUID(username);
+            console.log("UserID is", uid);
+            return uid;
         } else {
             throw new Error("Check your credentials again (password)");
         }

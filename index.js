@@ -1,9 +1,9 @@
 import path from 'path';
 import methodOverride from 'method-override';
-import { v4 as uuid } from 'uuid';
+import {v4 as uuid} from 'uuid';
 import express from 'express';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
+import cookieSession from "cookie-session"
+import {fileURLToPath} from 'url';
 import * as databaseHelper from './public/javascripts/databaseHelper.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -22,13 +22,17 @@ app.use(methodOverride('_method')); // To 'fake' put/patch/delete requests
 app.use(express.static(path.join(__dirname, 'public')));
 app.use("/stylesheets", express.static('public/stylesheets'));
 
-// In-memory storage for votes (replace with database in production)
-let votes = {};
+app.use(cookieSession({
+    name: 'session',
+    keys: ['sdkfhkdshfkjhdksfjhghsjdfgkjhfadskjgh'],
+    // Cookie Options
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}));
 
 app.get("/dashboard", async (req, res) => {
     try {
         const voteData = await databaseHelper.getVoteData();
-        res.render("dashboard", { voteData: voteData });
+        res.render("dashboard", {voteData: voteData});
     } catch (error) {
         console.error("Error fetching vote data:", error);
         res.status(500).send("Error fetching vote data");
@@ -43,17 +47,71 @@ app.get("/navbar", (req, res) => {
     res.render("navbar");
 });
 
-// New API route to save vote data
+app.post("/api/user/check-credentials", async (req, res) => {
+    if (req.session.authenticated) {
+        console.log("User already authenticated");
+        res.redirect("/index");
+    } else {
+        const username = req.body.username;
+        const password = req.body.password;
+
+        try {
+            const uid = await databaseHelper.checkCredentials(username, password);
+            if (uid) {
+                req.session.uid = uid;
+                req.session.authenticated = true;
+                res.json({success: true, message: "Login successful", uid: uid});
+                console.log("User logged in successfully");
+            } else {
+                res.json({success: false, message: "Login failed", uid: null});
+                console.log("User login failed");
+            }
+        } catch (err) {
+            res.json({success: false, message: "Login failed", uid: null});
+            console.error("Check your credentials again", err);
+        }
+    }
+
+});
+
+app.post("/api/user/logout", async (req, res) => {
+    if (req.session.authenticated) {
+        req.session = null;
+        res.json({success: true, message: "Logout successful", redirect: "/login"});
+    } else {
+        res.status(401).json({success: false, message: "Logout failed due to session not found", redirect: "/login"});
+    }
+});
+
+app.post("/api/vote/vote-for-options", async (req, res) => {
+    if (req.session.authenticated) {
+
+    } else {
+        res.redirect("/login");
+    }
+});
+
 app.post("/api/vote/update", async (req, res) => {
     const voteData = req.body;
     console.log("voteData", voteData);
 
     try {
         const updatedVote = await databaseHelper.updateVote(voteData.voteId, voteData);
-        res.json({ success: true, message: "Vote saved successfully", vote: updatedVote });
+        res.json({success: true, message: "Vote saved successfully", vote: updatedVote});
     } catch (error) {
         console.error("Error updating vote:", error);
-        res.status(500).json({ success: false, message: "Error updating vote", error: error.message });
+        res.status(500).json({success: false, message: "Error updating vote", error: error.message});
+    }
+});
+
+app.post("/api/vote/delete", async (req, res) => {
+    const voteId = req.body.voteId;
+    try {
+        await databaseHelper.removeVoteEntry(voteId);
+        console.log(`Vote ${voteId} deleted successfully`);
+    } catch (err) {
+        console.error("Error deleting vote:", err);
+        res.status(500).json({success: false, message: "Error deleting vote", error: err.message});
     }
 });
 
@@ -61,7 +119,7 @@ app.post("/api/vote/update", async (req, res) => {
 app.get("*", async (req, res) => {
     try {
         const voteData = await databaseHelper.getVoteData();
-        res.render("index", { voteData: voteData });
+        res.render("index", {voteData: voteData});
     } catch (error) {
         console.error("Error fetching vote data:", error);
         res.status(500).send("Error fetching vote data");

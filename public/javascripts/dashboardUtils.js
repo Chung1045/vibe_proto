@@ -91,60 +91,26 @@ $(document).ready(function () {
         let voteID = $(this).data('vote-id');
         if (voteID !== undefined) {
             if ($(this).data('action') === 'delete') {
+                $.ajax({
+                    url: '/api/vote/delete',
+                    method: 'POST',
+                    data: JSON.stringify({
+                        voteId: voteID
+                    }),
+                    contentType: 'application/json',
+                    success: function(response) {
+                        console.log('Vote deleted successfully:', response);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error deleting vote:', error);
+                    }
+                });
                 let voteEntry = document.querySelector(`.card[data-vote-id="${voteID}"]`);
                 $(voteEntry).remove();
                 $grid.masonry('layout');
             }
         }
     });
-
-    // $(document).on('click', '#btn-save-changes', function () {
-    //     const card = $(this).closest('.card');
-    //     const voteID = card.attr('data-vote-id');
-    //
-    //     // Collect edited data
-    //     const newTitle = card.find('.editable_title').text();
-    //     const newOptions = card.find('.editable_options').map(function() {
-    //         return $(this).text();
-    //     }).get();
-    //
-    //     // Update title
-    //     card.find('p:contains("Title")').remove();
-    //     const titleElement = $('<h2>').attr({
-    //         'id': 'text_voteTitle_h2',
-    //         'data-vote-id': voteID
-    //     }).text(newTitle);
-    //     card.find('.editable_title').replaceWith(titleElement);
-    //
-    //     // Update options
-    //     const optionsList = card.find(`#vote_option_list[data-vote-id="${voteID}"]`);
-    //     optionsList.empty();
-    //     card.find('p:contains("Options")').remove();
-    //     newOptions.forEach((option, index) => {
-    //         const optionElement = $('<p>').addClass('text_voteOptions_p')
-    //             .attr({
-    //                 'data-vote-id': voteID,
-    //                 'data-option-id': index + 1
-    //             })
-    //             .text(option);
-    //         optionsList.append(optionElement);
-    //     });
-    //
-    //     // Remove edit-related elements
-    //     card.find('.div-edit-options').remove();
-    //     card.find('.delete-option-icon').remove();
-    //
-    //     // Change save button back to edit button
-    //     $(this).attr({
-    //         'src': '/images/icns/pencil-square.svg',
-    //         'id': 'btn-edit'
-    //     });
-    //
-    //     // Recalculate Masonry layout
-    //     $('#container').masonry('layout');
-    //     extractVoteCardData(voteID);
-    //     saveVoteData(voteID);
-    // });
 
     $(document).on('click', '#btn-save-changes', function () {
         const card = $(this).closest('.card');
@@ -202,7 +168,7 @@ $(document).ready(function () {
         const options = card.find('.text_voteOptions_p').map(function() {
             return {
                 id: $(this).attr('data-option-id'),
-                text: $(this).text()
+                name: $(this).text()
             };
         }).get();
 
