@@ -2,7 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import {v4 as uuid} from 'uuid';
 import {fileURLToPath} from 'url';
-import req from "express/lib/request.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -103,12 +102,16 @@ async function insertNewVote(voteID, newVote) {
     }
 }
 
-async function removeVoteEntry(voteID) {
+async function removeVoteEntry(userUID, voteID) {
     console.log(`Removing vote entry with ID ${voteID}...`);
     const voteIndex = voteData.findIndex(item => item.voteId === voteID);
 
     if (voteIndex === -1) {
         throw new Error(`Vote entry with ID ${voteID} not found.`);
+    }
+
+    if (voteData[voteIndex].authorUid!== userUID) {
+        throw new Error(`User ${userUID} is not the author of the vote entry with ID ${voteID}. Cannot remove the vote entry.`);
     }
 
     const removedVote = voteData.splice(voteIndex, 1)[0];
@@ -251,8 +254,6 @@ async function getVoteStatistics(voteID) {
 
     // Calculate percentages and prepare the result
     const result = {
-        voteId: voteID,
-        totalVotes: totalVotes,
         options: {}
     };
 
@@ -261,7 +262,6 @@ async function getVoteStatistics(voteID) {
         const percentage = totalVotes > 0 ? (count / totalVotes) * 100 : 0;
         result.options[option.id] = {
             optionText: option.text,
-            count: count,
             percentage: parseFloat(percentage.toFixed(2))
         };
     }

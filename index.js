@@ -221,12 +221,17 @@ app.post("/api/vote/update", async (req, res) => {
 app.post("/api/vote/delete", async (req, res) => {
     const voteId = req.body.voteId;
     try {
-        await databaseHelper.removeVoteEntry(voteId);
+        console.log(`Deleting vote ${voteId}`);
+        await databaseHelper.removeVoteEntry(req.session.uid, voteId);
         console.log(`Vote ${voteId} deleted successfully`);
     } catch (err) {
         console.error("Error deleting vote:", err);
         res.status(500).json({success: false, message: "Error deleting vote", error: err.message});
     }
+});
+
+app.post("/api/vote/getStat", async (req, res) => {
+    console.log(await databaseHelper.getVoteStatistics("34fbbae8-1a62-4a76-95a5-6fef4822bd11"));
 });
 
 // Fallback route should be placed at the end
