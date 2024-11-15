@@ -1,6 +1,5 @@
 import path from 'path';
 import methodOverride from 'method-override';
-import {v4 as uuid} from 'uuid';
 import express from 'express';
 import cookieSession from "cookie-session"
 import {fileURLToPath} from 'url';
