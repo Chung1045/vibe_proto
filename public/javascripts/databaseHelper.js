@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import { v4 as uuid } from 'uuid';
-import { fileURLToPath } from 'url';
+import {v4 as uuid} from 'uuid';
+import {fileURLToPath} from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -65,7 +65,7 @@ async function updateVote(voteID, newVoteData) {
         if (!vote) {
             console.log(`Vote with ID ${voteID} not found. Inserting new vote entry...`);
 
-            if (voteID === "new-temporarily"){
+            if (voteID === "new-temporarily") {
                 console.log("Detected new vote entry. Creating a new vote record with new voteID");
                 return await insertNewVote(uuid(), newVoteData);
             } else {
@@ -115,7 +115,7 @@ async function removeVoteEntry(voteID) {
     console.log("Now remove the voteRecord entry as well");
     await removeVoteRecord(voteID).then(() => {
         console.log(`Vote record for ID ${voteID} removed successfully.`);
-    }).catch (err => {
+    }).catch(err => {
         console.error("Error removing vote record:", err);
     });
     return removedVote;
@@ -291,37 +291,31 @@ async function saveToUserDatabase() {
 
 // Update the changeUserName function
 async function changeUserName(uid, newUsername) {
-    console.log(`Changing username to ${newUsername}...`);
+    return new Promise(async (resolve, reject) => {
+        console.log(`Changing username to ${newUsername}...`);
+        // Check if the new username is already taken
+        const existingUser = await searchUser(newUsername);
+        if (existingUser) {
+            console.error(`Username ${newUsername} is already occupied`);
+            reject(new Error(`Username ${newUsername} is already occupied`));
+        }
 
-    // Check if the new username is already taken
-    const existingUser = await searchUser(newUsername);
-    if (existingUser) {
-        console.error(`Username ${newUsername} is already occupied`);
-        throw new Error(`Username ${newUsername} is already taken`);
-    }
+        // Find the user by UID
+        const userIndex = userData.findIndex(user => user.uid === uid);
+        if (userIndex === -1) {
+            console.error(`User with UID ${uid} not found`);
+            reject(new Error(`User with UID ${uid} not found`));
+        }
 
-    // Find the user by UID
-    const userIndex = userData.findIndex(user => user.uid === uid);
-    if (userIndex === -1) {
-        console.error(`User with UID ${uid} not found`);
-        throw new Error(`User with UID ${uid} not found`);
-    }
+        // Update the username
+        const oldUsername = userData[userIndex].username;
+        userData[userIndex].username = newUsername;
 
-    // Update the username
-    const oldUsername = userData[userIndex].username;
-    userData[userIndex].username = newUsername;
-
-    // Save the updated user data
-    try {
+        // Save the updated user data
         await saveToUserDatabase();
         console.log(`Username changed successfully from ${oldUsername} to ${newUsername}`);
-        return userData[userIndex];
-    } catch (err) {
-        console.error("Error saving updated user data:", err);
-        // Revert the change if saving fails
-        userData[userIndex].username = oldUsername;
-        throw err;
-    }
+        resolve({success: true, username: newUsername});
+    });
 }
 
 async function changeUserPhoneNumber(uid, newPhoneNumber) {
@@ -351,99 +345,99 @@ async function changeUserPhoneNumber(uid, newPhoneNumber) {
 }
 
 async function changeUserPassword(uid, oldPassword, newPassword) {
-    console.log(`Changing password for uid ${uid}}`);
+    return new Promise(async (resolve, reject) => {
+        console.log(`Changing password for uid ${uid}}`);
 
-    const userIndex = userData.findIndex(user => user.uid === uid);
-    if (userIndex === -1) {
-        console.error(`User with UID ${uid} not found`);
-        throw new Error(`User with UID ${uid} not found`);
-    }
+        const userIndex = userData.findIndex(user => user.uid === uid);
+        if (userIndex === -1) {
+            reject(new Error(`User with UID ${uid} not found`));
+        }
 
-    const user = userData[userIndex];
-    if (user.password!== oldPassword) {
-        console.error(`Old password does not match`);
-        throw new Error(`Old password does not match`);
-    }
+        const user = userData[userIndex];
+        if (user.password !== oldPassword) {
+            reject(new Error(`Old password does not match`));
+        }
 
-    userData[userIndex].password = newPassword;
+        userData[userIndex].password = newPassword;
 
-    try {
-        await saveToUserDatabase();
-        console.log(`Password changed successfully`);
-        return userData[userIndex];
-    } catch (err) {
-        console.error("Error saving updated user data:", err);
-    }
+        try {
+            await saveToUserDatabase();
+            console.log(`Password changed successfully`);
+            resolve({success: true, password: newPassword});
+        } catch (err) {
+            reject(new Error("Error saving updated user password\n" + err));
+        }
+    });
 }
 
 async function changeUserEmail(uid, newEmail) {
-    console.log(`Changing ${uid} email to ${newEmail}...`);
+    return new Promise(async (resolve, reject) => {
+        console.log(`Changing ${uid} email to ${newEmail}...`);
 
-    const userIndex = userData.findIndex(user => user.uid === uid);
-    if (userIndex === -1) {
-        console.error(`User with UID ${uid} not found`);
-        throw new Error(`User with UID ${uid} not found`);
-    }
+        const userIndex = userData.findIndex(user => user.uid === uid);
+        if (userIndex === -1) {
+            reject(new Error(`User with UID ${uid} not found`));
+        }
 
-    const oldEmail = userData[userIndex].email;
-    userData[userIndex].email = newEmail;
+        const oldEmail = userData[userIndex].email;
+        userData[userIndex].email = newEmail;
 
-    try {
-        await saveToUserDatabase();
-        console.log(`Email changed successfully from ${oldEmail} to ${newEmail}`);
-        return userData[userIndex];
-    } catch (err) {
-        console.error("Error saving updated user data:", err);
-    }
+        try {
+            await saveToUserDatabase();
+            console.log(`Email changed successfully from ${oldEmail} to ${newEmail}`);
+            resolve({success: true, email: newEmail});
+        } catch (err) {
+            reject(new Error("Error saving updated user data\n" + err));
+        }
+    });
 }
 
 async function createNewUser(username, password, email, phoneNum) {
-    console.log(`Creating new user with username ${username}...`);
+    return new Promise(async (resolve, reject) => {
+        console.log(`Creating new user with username ${username}...`);
 
-    // Check if username is already taken
-    const existingUser = await searchUser(username);
-    if (existingUser) {
-        console.error(`Username ${username} is already occupied`);
-        throw new Error(`Username ${username} is already taken`);
-    }
+        // Check if username is already taken
+        const existingUser = await searchUser(username);
+        if (existingUser) {
+            reject(new Error(`Username ${username} is already taken`));
+        }
 
-    // Validate phone number
-    if (!phoneNum.match(/^[4-9]\d{7}$/)) {
-        console.error(`Invalid phone number format: ${phoneNum}`);
-        throw new Error('Invalid phone number format. Must be 8 digits and start with 4-9.');
-    }
+        // Validate phone number
+        if (!phoneNum.match(/^[4-9]\d{7}$/)) {
+            reject(new Error('Invalid phone number format. Must be 8 digits and start with 4-9.'));
+        }
 
-    // Validate email (basic validation)
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email.match(emailRegex)) {
-        console.error(`Invalid email format: ${email}`);
-        throw new Error('Invalid email format');
-    }
+        // Validate email (basic validation)
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email.match(emailRegex)) {
+            reject(new Error('Invalid email format, email should contains "@"'));
+        }
 
-    // Create new user object
-    const newUser = {
-        uid: uuid(), // Generate a unique ID
-        username: username,
-        password: password, // Note: In a real application, you should hash the password
-        email: email,
-        phoneNum: phoneNum,
-        dateCreated: new Date().toISOString()
-    };
+        // Create new user object
+        const newUser = {
+            uid: uuid(), // Generate a unique ID
+            username: username,
+            password: password, // Note: In a real application, you should hash the password
+            email: email,
+            phoneNum: phoneNum,
+            dateCreated: new Date().toISOString()
+        };
 
-    // Add new user to userData array
-    userData.push(newUser);
+        // Add new user to userData array
+        userData.push(newUser);
 
-    // Save updated user data to database
-    try {
-        await saveToUserDatabase();
-        console.log(`New user ${username} created successfully`);
-        return newUser;
-    } catch (err) {
-        console.error("Error saving new user data:", err);
-        // Remove the new user from the array if saving fails
-        userData.pop();
-        throw err;
-    }
+        // Save updated user data to database
+        try {
+            await saveToUserDatabase();
+            console.log(`New user ${username} created successfully`);
+            resolve({success: true, userInfo: newUser, uid: newUser.uid});
+        } catch (err) {
+            // Remove the new user from the array if saving fails
+            userData.pop();
+            reject(new Error("Unable to save new user data\n" + err));
+        }
+
+    });
 }
 
 // ===== User Operations =====

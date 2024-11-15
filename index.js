@@ -74,6 +74,85 @@ app.post("/api/user/check-credentials", async (req, res) => {
 
 });
 
+app.post("/api/user/change-username", async (req, res) => {
+    if (!req.session.authenticated) {
+        return res.status(401).json({success: false, message: "User is not logged in, cannot perform action"});
+    }
+    try {
+        const result = await databaseHelper.changeUserName(req.session.uid, req.body.newUsername);
+        res.json({success: true, message: "Change username successful", newUsername: result.username});
+    } catch (error) {
+        console.error("Error changing username:", error);
+        res.status(400).json({success: false, message: error.message});
+    }
+});
+
+app.post("/api/user/change-password", async (req, res) => {
+    if (!req.session.authenticated) {
+        return res.status(401).json({success: false, message: "User is not logged in, cannot perform action"});
+    }
+    if (!req.body.newPassword || !req.body.oldPassword) {
+        return res.status(400).json({success: false, message: "Please provide your old and new password"});
+    }
+    try {
+        const result = await databaseHelper.changeUserName(req.session.uid, req.body.oldPassword, req.body.newPassword);
+        res.json({success: true, message: "Change password successful"});
+    } catch (error) {
+        console.error("Error changing password:", error);
+        res.status(400).json({success: false, message: error.message});
+    }
+});
+
+app.post("/api/user/change-email", async (req, res) => {
+    if (!req.session.authenticated) {
+        return res.status(401).json({success: false, message: "User is not logged in, cannot perform action"});
+    }
+
+    if (!req.body.newEmail) {
+        return res.status(400).json({success: false, message: "New email is required"});
+    }
+
+    try {
+        const result = await databaseHelper.changeUserEmail(req.session.uid, req.body.newEmail);
+        res.json({success: true, message: "Email changed successfully", newEmail: result.email});
+    } catch (error) {
+        console.error("Error changing email:", error);
+        res.status(400).json({success: false, message: error.message});
+    }
+});
+
+app.post("/api/user/register", async (req, res) => {
+    if (req.session.authenticated) {
+        return res.status(400).json({success: false, message: "User is already logged in, cannot register a new account"});
+    }
+
+    const { username, password, email, phoneNum } = req.body;
+
+    if (!username || !password || !email || !phoneNum) {
+        return res.status(400).json({success: false, message: "Please provide all required fields"});
+    }
+
+    try {
+        const result = await databaseHelper.createNewUser(username, password, email, phoneNum);
+
+        // Set session data
+        req.session.authenticated = true;
+        req.session.uid = result.uid;
+        req.session.username = username;
+
+        res.json({
+            success: true,
+            message: "User registered successfully",
+            uid: result.uid,
+            username: result.userInfo.username,
+            email: result.userInfo.email
+        });
+    } catch (error) {
+        console.error("Error registering user:", error);
+        res.status(400).json({success: false, message: error.message});
+    }
+});
+
 app.post("/api/user/logout", async (req, res) => {
     if (req.session.authenticated) {
         req.session = null;
