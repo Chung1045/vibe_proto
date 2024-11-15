@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import {v4 as uuid} from 'uuid';
 import {fileURLToPath} from 'url';
+import req from "express/lib/request.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -58,13 +59,13 @@ async function searchVote(voteId) {
     return voteData.find(item => item.voteId === voteId);
 }
 
-async function updateVote(voteID, newVoteData) {
+async function updateVote(userID, voteID, newVoteData) {
     try {
         let vote = await searchVote(voteID);
         console.log("Search result: ", vote);
         if (!vote) {
             console.log(`Vote with ID ${voteID} not found. Inserting new vote entry...`);
-
+            newVoteData.authorUid = userID;
             if (voteID === "new-temporarily") {
                 console.log("Detected new vote entry. Creating a new vote record with new voteID");
                 return await insertNewVote(uuid(), newVoteData);
@@ -75,6 +76,7 @@ async function updateVote(voteID, newVoteData) {
         } else {
             Object.assign(vote, newVoteData);
             vote.dateModified = new Date().toISOString();
+            vote.authorUid = userID;
             await saveToVoteDatabase();
             await initVoteRecord(voteID);
             return vote;
@@ -124,7 +126,7 @@ async function removeVoteEntry(voteID) {
 function rearrangeVoteJSONEntry(vote) {
     return {
         "voteId": vote.voteId,
-        "authorUid": "Hi", // Just testing
+        "authorUid": vote.authorUid, // Just testing
         "dateModified": vote.dateModified,
         "voteTitle": vote.voteTitle,
         "voteOptions": vote.voteOptions,
@@ -177,45 +179,49 @@ async function removeVoteRecord(voteID) {
     });
 }
 
-async function voteForOptions(voteID, voteOptionID) {
-    let uid = "123456"; // This should be replaced with the actual user ID
+async function voteForOptions(userUID, voteID, voteOptionID) {
+    // Find the vote record in voteRecords array
     let voteRecord = voteRecords.find(item => item.voteId === voteID);
+
+    // Find the vote in voteData array
     let vote = voteData.find(item => item.voteId === voteID);
 
+    // Error if no vote record exists
     if (!voteRecord) {
         console.error(`Vote record with ID ${voteID} not found. Cannot vote`);
         throw new Error(`Vote record with ID ${voteID} not found`);
     }
 
+    // Error if no vote exists
     if (!vote) {
         console.error(`Vote with ID ${voteID} not found in voteData`);
         throw new Error(`Vote with ID ${voteID} not found`);
     }
 
-    // Check if the vote option exists
+    // Error if the vote option doesn't exist
     if (!vote.voteOptions.some(option => option.id === voteOptionID)) {
         console.error(`Vote option with ID ${voteOptionID} does not exist for vote ${voteID}`);
         throw new Error(`Invalid vote option`);
     }
 
     // Check if the user has already voted
-    if (voteRecord.voteStatistics.some(stat => stat.uid === uid)) {
-        console.error(`User ${uid} has already voted for vote ${voteID}`);
+    if (voteRecord.voteStatistics.some(stat => stat.uid === userUID)) {
+        console.error(`User ${userUID} has already voted for vote ${voteID}`);
         throw new Error(`User has already voted`);
     }
 
     console.log("Vote record found. Voting...");
 
-    // Add the user's vote
+    // Add the user's vote to the vote record
     voteRecord.voteStatistics.push({
-        uid: uid,
+        uid: userUID,
         vote: voteOptionID
     });
 
-    // Save the updated vote record
-    await saveToVoteRecordDatabase();
+    // Save the updated vote record to the database (implement the save logic)
+    await saveToVoteRecordDatabase(voteRecord);
 
-    console.log(`Vote recorded successfully for user ${uid} on vote ${voteID}`);
+    console.log(`Vote recorded successfully for user ${userUID} on vote ${voteID}`);
     return voteRecord;
 }
 
