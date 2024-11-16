@@ -1,22 +1,29 @@
 [
   {
-    "voteId": "2dbe6bfe-f284-413f-ae73-d36df7610226",
-    "voteStatistics": []
+    "voteId": "625d0439-d293-407e-a39e-10765a239643",
+    "voteStatistics": [
+      {
+        "uid": "a4e4a04c-0b99-4c3a-9a8d-ea62ba61974f",
+        "vote": "1"
+      }
+    ]
   },
   {
-    "voteId": "5f15769a-3516-4089-afbf-d2f4455bed9b",
-    "voteStatistics": []
+    "voteId": "33e36325-5485-4567-927e-033cc1cd25bf",
+    "voteStatistics": [
+      {
+        "uid": "a4e4a04c-0b99-4c3a-9a8d-ea62ba61974f",
+        "vote": "1"
+      }
+    ]
   },
   {
-    "voteId": "c09ec2e6-b97c-4294-87af-90711b6e3633",
-    "voteStatistics": []
-  },
-  {
-    "voteId": "10084648-f1b0-4a8c-b580-1aba7d46970e",
-    "voteStatistics": []
-  },
-  {
-    "voteId": "19e4edb4-24b7-4fe7-906a-9193453c8ab4",
-    "voteStatistics": []
+    "voteId": "03696c24-f9b5-4eb1-8e77-a6facf676953",
+    "voteStatistics": [
+      {
+        "uid": "a4e4a04c-0b99-4c3a-9a8d-ea62ba61974f",
+        "vote": "1"
+      }
+    ]
   }
 ]

@@ -67,26 +67,64 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Function to update vote display
-    function updateVoteDisplay(card, voteRecord) {
+    async function updateVoteDisplay(card) {
+        const voteId = card.dataset.voteId;
         const options = card.querySelectorAll('.text_voteOptions_p');
-        const totalVotes = voteRecord.voteStatistics.length;
 
-        options.forEach(option => {
-            option.classList.add('voted');
-            option.removeEventListener('click', handleVoteClick);
+        try {
+            const response = await fetch('/api/vote/getStat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ voteId: voteId }),
+            });
 
-            const optionId = option.dataset.optionId;
-            const voteCount = voteRecord.voteStatistics.filter(v => v.vote === optionId).length;
-            const percentage = (voteCount / totalVotes * 100).toFixed(1);
-
-            let percentageSpan = option.querySelector('.vote-percentage');
-            if (!percentageSpan) {
-                percentageSpan = document.createElement('span');
-                percentageSpan.classList.add('vote-percentage');
-                option.appendChild(percentageSpan);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch vote results: ${response.status} ${response.statusText}`);
             }
-            percentageSpan.textContent = `${percentage}%`;
-        });
+
+            const voteResults = await response.json();
+            console.log('Vote results:', voteResults);
+
+            if (!voteResults || typeof voteResults.options !== 'object') {
+                throw new Error('Invalid vote results structure');
+            }
+
+            const hasVotes = Object.values(voteResults.options).some(option => option.percentage > 0);
+
+            options.forEach(option => {
+                const optionId = option.dataset.optionId;
+                const optionResult = voteResults.options[optionId];
+
+                let percentageSpan = option.querySelector('.vote-percentage');
+                if (!percentageSpan) {
+                    percentageSpan = document.createElement('span');
+                    percentageSpan.classList.add('vote-percentage');
+                    option.appendChild(percentageSpan);
+                }
+
+                if (hasVotes) {
+                    option.classList.add('voted');
+                    option.removeEventListener('click', handleVoteClick);
+                    percentageSpan.textContent = `${optionResult.percentage.toFixed(1)}%`;
+                } else {
+                    option.classList.remove('voted');
+                    option.addEventListener('click', handleVoteClick);
+                    percentageSpan.textContent = '0.0%';
+                }
+            });
+
+            if (hasVotes) {
+                card.classList.remove('no-votes');
+            } else {
+                card.classList.add('no-votes');
+            }
+        } catch (error) {
+            console.error('Error updating vote display:', error);
+            console.error('Vote ID:', voteId);
+            console.error('Card:', card);
+        }
     }
 
     // Function to handle vote click
@@ -112,25 +150,57 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Initialize vote cards
-    function initializeVoteCards() {
-        const voteCards = document.querySelectorAll('#vote_card');
-        voteCards.forEach(card => {
-            const voteId = card.dataset.voteId;
+    async function checkIfVoted(voteID) {
+        try {
+            const response = await fetch('/api/vote/check-voted', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ voteID: voteID }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data.hasVoted;
+        } catch (error) {
+            console.error('Error checking if voted:', error);
+            return false; // Assume not voted in case of error
+        }
+    }
+
+// In your initializeVoteCards function:
+    async function initializeVoteCards() {
+        console.log('Initializing vote cards');
+        const voteCards = document.querySelectorAll('.card');
+        console.log('Number of vote cards:', voteCards.length);
+
+        for (const card of voteCards) {
+            const voteID = card.dataset.voteId;
             const options = card.querySelectorAll('.text_voteOptions_p');
 
-            // Check if this vote has already been voted on
-            const isVoted = options[0].classList.contains('voted');
+            console.log('Processing vote card:', { voteID, optionsCount: options.length });
 
-            if (isVoted && window.userVotes && window.userVotes[voteId]) {
-                // If already voted, update the display with percentages
-                updateVoteDisplay(card, window.userVotes[voteId]);
+            const hasVoted = await checkIfVoted(voteID);
+
+            console.log('Has voted:', hasVoted);
+
+            if (hasVoted) {
+                console.log('Updating display for voted card:', voteID);
+                updateVoteDisplay(card);
             } else {
-                // If not voted, add click listeners
+                console.log('Adding click listeners for non-voted card:', voteID);
                 options.forEach(option => {
+                    // Remove any existing listeners first
+                    option.removeEventListener('click', handleVoteClick);
+                    // Add new click listener
                     option.addEventListener('click', handleVoteClick);
                 });
             }
-        });
+        }
     }
 
     // Initialize everything

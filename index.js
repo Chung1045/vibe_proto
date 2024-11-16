@@ -185,15 +185,6 @@ app.post("/api/user/register", async (req, res) => {
     }
 });
 
-// app.post("/api/user/logout", async (req, res) => {
-//     if (req.session.authenticated) {
-//         req.session = null;
-//         res.json({success: true, message: "Logout successful", redirect: "/login"});
-//     } else {
-//         res.status(401).json({success: false, message: "Logout failed due to session not found", redirect: "/login"});
-//     }
-// });
-
 app.post("/api/user/logout", (req, res) => {
     // Destroy the session
     req.session = null;
@@ -256,7 +247,35 @@ app.post("/api/vote/delete", async (req, res) => {
 });
 
 app.post("/api/vote/getStat", async (req, res) => {
-    console.log(await databaseHelper.getVoteStatistics("34fbbae8-1a62-4a76-95a5-6fef4822bd11"));
+    try {
+        const { voteId } = req.body;
+        if (!voteId) {
+            return res.status(400).json({ error: 'voteId is required' });
+        }
+
+        const voteStatistics = await databaseHelper.getVoteStatistics(voteId);
+
+        res.json(voteStatistics);
+    } catch (error) {
+        console.error('Error fetching vote statistics:', error);
+        if (error.message.includes('not found')) {
+            res.status(404).json({ error: error.message });
+        } else {
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    }
+});
+
+app.post("/api/vote/check-voted", async (req, res) => {
+    try {
+        console.log("Checking if user has voted");
+        const hasVoted = await databaseHelper.checkIfVoted(req.body.voteID, req.session.uid);
+        console.log("User has voted:", hasVoted);
+        res.json({ hasVoted: hasVoted });
+    } catch (error) {
+        console.error("Error checking if user has voted:", error);
+        res.status(500).json({ error: "An error occurred while checking vote status" });
+    }
 });
 
 app.get("/api/vote/getDateModified", async (req, res) => {
