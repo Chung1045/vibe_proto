@@ -11,16 +11,6 @@ body {
     justify-content: center;
     align-items: center;
 }
-
-.register-container {
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-    max-width: 400px;
-    width: 90%;
-}
-
 .title {
     font-family: 'Young Serif', serif;
     text-align: left;
@@ -36,22 +26,36 @@ body {
     color: #666;
 }
 
+.register-container {
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    width: 100%; /* Changed from 90% to 100% */
+    box-sizing: border-box; /* Add this to include padding in the width calculation */
+}
+
+
 .register-form .form-group {
-    margin-bottom: 20px;
-    position: relative; /* Needed for label positioning */
+    margin-bottom: 20px; /* Changed from 15px to 20px to match Login.css */
+    position: relative;
 }
 
 .register-form input {
-    width: 95%;
+    width: 100%; /* Changed from 95% to 100% */
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid #ababab;
     border-radius: 5px;
     font-size: 16px;
     font-family: 'Inter', sans-serif;
+    transition: border-color 0.3s ease;
+    color: #6b72e1;
+    background: transparent;
+    box-sizing: border-box; /* Add this to include padding in the width calculation */
 }
 
 .register-form input {
-    width: 95%; /* Adjusted width */
     padding: 10px;
     border: 1px solid #ababab;
     border-radius: 5px;
@@ -113,6 +117,13 @@ body {
     font-size: 16px;
     cursor: pointer;
     font-family: 'Inter', sans-serif;
+    transition: 0.5s; /* Add transition for hover effect */
+}
+
+.register-form .register_button:hover {
+    opacity: 1;
+    background-color: #3543ff;
+    color: #ffffff;
 }
 
 .register-form .sign-up {
@@ -121,11 +132,14 @@ body {
     font-size: 14px;
 }
 
+/* Position the eye icon */
 .eye-icon {
     position: absolute;
-    right: 10px; /* Adjust the position */
+    right: 10px;
     top: 50%;
     transform: translateY(-50%);
-    cursor: pointer; /* Pointer on hover */
+    cursor: pointer;
     color: #000000; /* Eye icon color */
 }
+
+/* Add any additional styles from Login.css that might be missing */

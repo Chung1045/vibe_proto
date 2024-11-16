@@ -5,6 +5,7 @@ import cookieSession from "cookie-session"
 import {fileURLToPath} from 'url';
 import * as databaseHelper from './public/javascripts/databaseHelper.js';
 import {voteForOptions} from "./public/javascripts/databaseHelper.js";
+import {v4 as uuid} from 'uuid';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,7 +30,19 @@ app.use(cookieSession({
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
 
-app.get("/dashboard", async (req, res) => {
+// Authentication middleware
+const requireAuth = (req, res, next) => {
+    if (!req.session || !req.session.authenticated) {
+        return res.redirect('/login');
+    }
+    next();
+};
+
+app.get("/", (req, res) => {
+    res.redirect("/login");
+});
+
+app.get("/dashboard", requireAuth, async (req, res) => {
     try {
         const voteData = await databaseHelper.getVoteData();
         res.render("dashboard", {voteData: voteData});
@@ -39,27 +52,27 @@ app.get("/dashboard", async (req, res) => {
     }
 });
 
-app.get("/login", (req, res) => {
-    if (req.session.authenticated) {
-        res.redirect("/index");
-    } else {
-        res.render("login");
+app.get("/register", (req, res) => {
+    // Check if user is already authenticated
+    if (req.session && req.session.authenticated) {
+        return res.redirect("/index");
     }
+    res.render("Register");
 });
 
-app.get("/register", (req, res) => {
-    if (req.session.authenticated) {
-        res.redirect("/index");
-    } else {
-        res.render("Register");
+app.get("/login", (req, res) => {
+    // Check if user is already authenticated
+    if (req.session && req.session.authenticated) {
+        return res.redirect("/index");
     }
+    res.render("login");
 });
 
 app.get("/navbar", (req, res) => {
     res.render("navbar");
 });
 
-app.get("/settings", (req, res) => {
+app.get("/settings", requireAuth, (req, res) => {
     res.render("settings");
 });
 
@@ -138,23 +151,25 @@ app.post("/api/user/change-email", async (req, res) => {
 });
 
 app.post("/api/user/register", async (req, res) => {
-    if (req.session.authenticated) {
-        return res.status(400).json({success: false, message: "User is already logged in, cannot register a new account"});
+    // Check if user is already logged in
+    if (req.session && req.session.authenticated) {
+        return res.status(400).json({
+            success: false,
+            message: "User is already logged in, please log out first"
+        });
     }
 
     const { username, password, email, phoneNum } = req.body;
 
-    if (!username || !password || !email || !phoneNum) {
-        return res.status(400).json({success: false, message: "Please provide all required fields"});
-    }
-
     try {
-        const result = await databaseHelper.createNewUser(username, password, email, phoneNum);
+        const result = await databaseHelper.createNewUser(uuid(), username, password, email, phoneNum);
 
         // Set session data
-        req.session.authenticated = true;
-        req.session.uid = result.uid;
-        req.session.username = username;
+        req.session = {
+            authenticated: true,
+            uid: result.uid,
+            username: username
+        };
 
         res.json({
             success: true,
@@ -164,18 +179,29 @@ app.post("/api/user/register", async (req, res) => {
             email: result.userInfo.email
         });
     } catch (error) {
-        console.error("Error registering user:", error);
-        res.status(400).json({success: false, message: error.message});
+        // Catch the error and send it back to the client
+        console.error("Error during user registration:", error.message); // Log the error for debugging
+        res.status(400).json({ success: false, message: error.message });
     }
 });
 
-app.post("/api/user/logout", async (req, res) => {
-    if (req.session.authenticated) {
-        req.session = null;
-        res.json({success: true, message: "Logout successful", redirect: "/login"});
-    } else {
-        res.status(401).json({success: false, message: "Logout failed due to session not found", redirect: "/login"});
-    }
+// app.post("/api/user/logout", async (req, res) => {
+//     if (req.session.authenticated) {
+//         req.session = null;
+//         res.json({success: true, message: "Logout successful", redirect: "/login"});
+//     } else {
+//         res.status(401).json({success: false, message: "Logout failed due to session not found", redirect: "/login"});
+//     }
+// });
+
+app.post("/api/user/logout", (req, res) => {
+    // Destroy the session
+    req.session = null;
+    res.status(200).json({
+        success: true,
+        message: "Logout successful"
+    });
+
 });
 
 app.post("/api/vote/vote-for-options", async (req, res) => {
@@ -203,7 +229,6 @@ app.post("/api/vote/vote-for-options", async (req, res) => {
         res.status(401).json({ error: "Unauthorized. Please log in." });
     }
 });
-
 
 app.post("/api/vote/update", async (req, res) => {
     const voteData = req.body;

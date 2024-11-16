@@ -398,30 +398,30 @@ async function changeUserEmail(uid, newEmail) {
     });
 }
 
-async function createNewUser(username, password, email, phoneNum) {
+async function createNewUser(userUid, username, password, email, phoneNum) {
     return new Promise(async (resolve, reject) => {
         console.log(`Creating new user with username ${username}...`);
 
         // Check if username is already taken
         const existingUser = await searchUser(username);
         if (existingUser) {
-            reject(new Error(`Username ${username} is already taken`));
+            return reject(new Error(`Username ${username} is already taken`));
         }
 
         // Validate phone number
         if (!phoneNum.match(/^[4-9]\d{7}$/)) {
-            reject(new Error('Invalid phone number format. Must be 8 digits and start with 4-9.'));
+            return reject(new Error('Invalid phone number format. Must be 8 digits and start with 4-9.'));
         }
 
         // Validate email (basic validation)
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!email.match(emailRegex)) {
-            reject(new Error('Invalid email format, email should contains "@"'));
+            return reject(new Error('Invalid email format, email should contain "@"'));
         }
 
         // Create new user object
         const newUser = {
-            uid: uuid(), // Generate a unique ID
+            uid: userUid,
             username: username,
             password: password, // Note: In a real application, you should hash the password
             email: email,
@@ -442,7 +442,6 @@ async function createNewUser(username, password, email, phoneNum) {
             userData.pop();
             reject(new Error("Unable to save new user data\n" + err));
         }
-
     });
 }
 

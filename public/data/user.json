@@ -6,5 +6,13 @@
     "email": "chung@example.com",
     "phoneNum": "0912345678",
     "profilePicURL": null
+  },
+  {
+    "uid": "a4e4a04c-0b99-4c3a-9a8d-ea62ba61974f",
+    "username": "newuser",
+    "password": "12345678",
+    "email": "newuser@example.com",
+    "phoneNum": "45678901",
+    "dateCreated": "2024-11-16T04:40:59.031Z"
   }
 ]
