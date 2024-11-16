@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     var container = document.querySelector('#container');
     var msnry;
 
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ voteID: voteID, voteOptionID: optionID }),
+                body: JSON.stringify({voteID: voteID, voteOptionID: optionID}),
             });
 
             if (!response.ok) {
@@ -72,31 +72,47 @@ document.addEventListener('DOMContentLoaded', function() {
         const options = card.querySelectorAll('.text_voteOptions_p');
 
         try {
-            const response = await fetch('/api/vote/getStat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ voteId: voteId }),
-            });
-
-            if (!response.ok) {
-                throw new Error(`Failed to fetch vote results: ${response.status} ${response.statusText}`);
-            }
-
-            const voteResults = await response.json();
-            console.log('Vote results:', voteResults);
+            const [voteResults, userVotedOptionData] = await Promise.all([
+                fetch('/api/vote/getStat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ voteId: voteId }),
+                }).then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch vote results: ${response.status}`);
+                    }
+                    return response.json();
+                }),
+                getUserVotedOption(voteId)
+            ]);
 
             if (!voteResults || typeof voteResults.options !== 'object') {
                 throw new Error('Invalid vote results structure');
             }
 
+            // Extract the actual option ID from the structure
+            const userVotedOption = userVotedOptionData && userVotedOptionData.voteOption && userVotedOptionData.voteOption.optionId;
+
+            console.log('Vote results:', voteResults);
+            console.log('User voted option data:', userVotedOptionData);
+            console.log('Extracted user voted option:', userVotedOption);
+
             const hasVotes = Object.values(voteResults.options).some(option => option.percentage > 0);
+
+            // Add voted class to card if there are votes
+            if (hasVotes) {
+                card.classList.add('voted');
+            } else {
+                card.classList.remove('voted');
+            }
 
             options.forEach(option => {
                 const optionId = option.dataset.optionId;
                 const optionResult = voteResults.options[optionId];
 
+                // Create or get percentage span
                 let percentageSpan = option.querySelector('.vote-percentage');
                 if (!percentageSpan) {
                     percentageSpan = document.createElement('span');
@@ -105,25 +121,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 if (hasVotes) {
-                    option.classList.add('voted');
+                    // Remove click handler and add voted class
                     option.removeEventListener('click', handleVoteClick);
-                    percentageSpan.textContent = `${optionResult.percentage.toFixed(1)}%`;
+                    option.classList.add('voted');
+
+                    // Update percentage display
+                    const percentage = optionResult.percentage.toFixed(1);
+                    percentageSpan.textContent = `${percentage}%`;
+                    option.style.setProperty('--option-percentage', `${percentage}%`);
+
+                    // Apply selected/unselected styles
+                    console.log("Comparing option id:", optionId, "with user voted option:", userVotedOption);
+                    if (optionId === userVotedOption) {
+                        console.log("Match found! Applying user-selected class to option:", optionId);
+                        option.classList.add('user-selected');
+                        option.classList.remove('other-option');
+                    } else {
+                        console.log("No match. Applying other-option class to option:", optionId);
+                        option.classList.remove('user-selected');
+                        option.classList.add('other-option');
+                    }
                 } else {
-                    option.classList.remove('voted');
+                    // Reset option to unvoted state
+                    option.classList.remove('voted', 'user-selected', 'other-option');
                     option.addEventListener('click', handleVoteClick);
-                    percentageSpan.textContent = '0.0%';
+                    percentageSpan.textContent = '';
+                    option.style.setProperty('--option-percentage', '0%');
                 }
             });
-
-            if (hasVotes) {
-                card.classList.remove('no-votes');
-            } else {
-                card.classList.add('no-votes');
-            }
         } catch (error) {
             console.error('Error updating vote display:', error);
-            console.error('Vote ID:', voteId);
-            console.error('Card:', card);
         }
     }
 
@@ -157,7 +184,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ voteID: voteID }),
+                body: JSON.stringify({voteID: voteID}),
             });
 
             if (!response.ok) {
@@ -182,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const voteID = card.dataset.voteId;
             const options = card.querySelectorAll('.text_voteOptions_p');
 
-            console.log('Processing vote card:', { voteID, optionsCount: options.length });
+            console.log('Processing vote card:', {voteID, optionsCount: options.length});
 
             const hasVoted = await checkIfVoted(voteID);
 
@@ -190,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (hasVoted) {
                 console.log('Updating display for voted card:', voteID);
-                updateVoteDisplay(card);
+                await updateVoteDisplay(card);
             } else {
                 console.log('Adding click listeners for non-voted card:', voteID);
                 options.forEach(option => {
@@ -200,6 +227,33 @@ document.addEventListener('DOMContentLoaded', function() {
                     option.addEventListener('click', handleVoteClick);
                 });
             }
+        }
+    }
+
+    async function getUserVotedOption(voteId) {
+        try {
+            const response = await fetch('/api/vote/get-vote-option', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ voteId: voteId }),
+            });
+
+            if (!response.ok) {
+                if (response.status === 404) {
+                    // User hasn't voted yet
+                    return null;
+                }
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('Raw user voted option data:', data);
+            return data; // This should be an object with a voteOption property
+        } catch (error) {
+            console.error('Error getting user voted option:', error);
+            return null;
         }
     }
 

@@ -268,6 +268,37 @@ async function getVoteStatistics(voteID) {
     return result;
 }
 
+async function getVotedOption(uid, voteID) {
+    const voteRecord = voteRecords.find(item => item.voteId === voteID);
+    if (!voteRecord) {
+        throw new Error(`Vote record with ID ${voteID} not found.`);
+    }
+
+    const vote = voteData.find(item => item.voteId === voteID);
+    if (!vote) {
+        throw new Error(`Vote with ID ${voteID} not found in voteData.`);
+    }
+
+    // Find the user's vote in the voteStatistics
+    const userVote = voteRecord.voteStatistics.find(stat => stat.uid === uid);
+
+    if (!userVote) {
+        // User hasn't voted on this vote
+        return null;
+    }
+
+    // Find the corresponding option in voteData
+    const votedOption = vote.voteOptions.find(option => option.id === userVote.vote);
+
+    if (!votedOption) {
+        throw new Error(`Voted option with ID ${userVote.vote} not found in voteData.`);
+    }
+
+    return {
+        optionId: votedOption.id,
+    };
+}
+
 async function checkIfVoted(voteID, uid) {
     console.log(`Checking if user ${uid} has voted for vote ${voteID}...`);
 
@@ -511,5 +542,6 @@ export {
     saveToVoteRecordDatabase,
     rearrangeVoteJSONEntry,
     getVoteData,
-    getVoteById
+    getVoteById,
+    getVotedOption
 };

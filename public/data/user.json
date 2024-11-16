@@ -14,5 +14,21 @@
     "email": "newuser@example.com",
     "phoneNum": "45678901",
     "dateCreated": "2024-11-16T04:40:59.031Z"
+  },
+  {
+    "uid": "46866dc6-b976-4404-b7b1-a21757ce2c2d",
+    "username": "newuser2",
+    "password": "12345678",
+    "email": "newuser@example.com",
+    "phoneNum": "45678901",
+    "dateCreated": "2024-11-16T15:33:32.034Z"
+  },
+  {
+    "uid": "ca944b4e-fbcf-4ca8-b6ec-9085bdefa6c1",
+    "username": "sam",
+    "password": "12345678",
+    "email": "sam@example.com",
+    "phoneNum": "56785678",
+    "dateCreated": "2024-11-16T15:35:31.378Z"
   }
 ]

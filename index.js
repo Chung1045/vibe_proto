@@ -278,6 +278,25 @@ app.post("/api/vote/check-voted", async (req, res) => {
     }
 });
 
+app.post("/api/vote/get-vote-option", async (req, res) => {
+    const voteId = req.body.voteId;
+    if (!voteId) {
+        return res.status(400).json({ error: "voteId is required" });
+    }
+
+    try {
+        const voteOption = await databaseHelper.getVotedOption(req.session.uid, voteId);
+        res.json({ voteOption });
+    } catch (error) {
+        console.error("Error fetching vote option:", error);
+        if (error.message.includes("not found")) {
+            res.status(404).json({ error: error.message });
+        } else {
+            res.status(500).json({ error: "Internal server error" });
+        }
+    }
+});
+
 app.get("/api/vote/getDateModified", async (req, res) => {
     const voteId = req.query.voteId;
     try {

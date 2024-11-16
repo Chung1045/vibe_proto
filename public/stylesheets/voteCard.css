@@ -41,6 +41,36 @@
     background-color: #f0f0f0;
 }
 
+.text_voteOptions_p::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: var(--option-percentage, 0%);
+    background-color: rgba(0, 123, 255, 0.2); /* Light blue background */
+    transition: width 0.3s ease; /* Fixed typo: 'wdith' to 'width' */
+    z-index: 0;
+}
+
+.text_voteOptions_p.user-selected {
+    background-color: #4CAF50; /* Green background for user-selected option */
+    color: white;
+}
+
+.text_voteOptions_p.user-selected::before {
+    background-color: rgba(53, 143, 60, 0.2); /* Lighter green for selected option */
+}
+
+.text_voteOptions_p.other-option {
+    background-color: #f0f0f0; /* Light gray background for other options */
+}
+
+.text_voteOptions_p > * {
+    position: relative;
+    z-index: 1;
+}
+
 .option-text {
     flex-grow: 1;
     margin-right: 10px;
