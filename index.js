@@ -236,7 +236,7 @@ app.post("/api/vote/update", async (req, res) => {
 
     try {
         const updatedVote = await databaseHelper.updateVote(req.session.uid, voteData.voteId, voteData);
-        res.json({success: true, message: "Vote saved successfully", vote: updatedVote});
+        res.json({success: true, message: "Vote saved successfully", vote: updatedVote, voteID: updatedVote.voteId});
     } catch (error) {
         console.error("Error updating vote:", error);
         res.status(500).json({success: false, message: "Error updating vote", error: error.message});

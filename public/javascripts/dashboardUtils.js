@@ -28,7 +28,6 @@ $(document).ready(function () {
     $(document).on('click', '#btn-fab-createVote', function () {
         let containerView = $('#container');
 
-
         const newCardStruct = $(`
     <div class="card" id="vote_card" data-vote-id="new-temporarily" data-creation-type="new" style="position: absolute; left: 20px; top: 20px;">
         <p>Title</p><div contenteditable="" class="editable_title" style="margin: 0px 0px 15px; display: block; width: 100%;">Write your Vote Title here</div>
@@ -39,7 +38,7 @@ $(document).ready(function () {
         </div>
         <div class="div-edit-options"><hr class="editable_hr"><div class="editable_addOptions">Add new options</div></div>
         <div class="d-flex justify-content-end" id="div_container_action_button">
-        <p class="p-last-modified" data-vote-id="<%= vote.voteId %>"><span class="time-ago"></span></p>
+        <p class="p-last-modified" data-vote-id="new-temporarily" data-date-modified="${new Date().toISOString()}"><span class="time-ago">now</span></p>
             <img src="/images/icns/trash-fill.svg" alt="icon" id="btn-delete">
             <img src="/images/icns/check2.svg" alt="icon" id="btn-save-changes">
         </div>
@@ -181,34 +180,77 @@ $(document).ready(function () {
     }
 
     function saveVoteData(voteData) {
+        const isNewVote = voteData.voteId === 'new-temporarily';
+        const url = '/api/vote/update';
+
         $.ajax({
-            url: '/api/vote/update',
+            url: url,
             method: 'POST',
             data: JSON.stringify(voteData),
             contentType: 'application/json',
             success: function(response) {
-                console.log('Vote updated successfully:', response);
-                // Fetch the updated dateModified
-                const lastModifiedElement = $(`.p-last-modified[data-vote-id="${voteData.voteId}"]`);
-                $.ajax({
-                    url: '/api/vote/getDateModified',
-                    method: 'GET',
-                    data: { voteId: voteData.voteId },
-                    success: function(dateResponse) {
-                        lastModifiedElement.attr('data-date-modified', dateResponse.dateModified);
-                        updateTimeAgo(lastModifiedElement);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error fetching updated date modified:', error);
+                if (response.success) {
+                    console.log(isNewVote ? 'Vote created successfully:' : 'Vote updated successfully:', response);
+
+                    const newVoteId = response.voteID || response.vote.voteId;
+                    if (isNewVote && newVoteId) {
+                        updateVoteId('new-temporarily', newVoteId);
                     }
-                });
-                // You can add a visual feedback here, like a toast notification
+
+                    const lastModifiedElement = $(`.p-last-modified[data-vote-id="${newVoteId}"]`);
+                    if (response.vote && response.vote.dateModified) {
+                        lastModifiedElement.attr('data-date-modified', response.vote.dateModified);
+                        updateAllTimeAgo();
+                    } else {
+                        // If dateModified is not in the response, fetch it
+                        $.ajax({
+                            url: '/api/vote/getDateModified',
+                            method: 'GET',
+                            data: { voteId: newVoteId },
+                            success: function(dateResponse) {
+                                lastModifiedElement.attr('data-date-modified', dateResponse.dateModified);
+                                updateAllTimeAgo();
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Error fetching updated date modified:', error);
+                            }
+                        });
+                    }
+
+                    // You can add a visual feedback here, like a toast notification
+                } else {
+                    console.error(isNewVote ? 'Error creating vote:' : 'Error updating vote:', response.message);
+                    // Handle the error, maybe show an error message to the user
+                }
             },
             error: function(xhr, status, error) {
-                console.error('Error updating vote:', error);
+                console.error(isNewVote ? 'Error creating vote:' : 'Error updating vote:', error);
                 // You can add error handling here, like showing an error message to the user
             }
         });
+    }
+
+    function updateVoteId(oldVoteId, newVoteId) {
+        const card = $(`.card[data-vote-id="${oldVoteId}"]`);
+        if (card.length) {
+            // Update card
+            card.attr('data-vote-id', newVoteId);
+
+            // Update vote option list
+            card.find(`#vote_option_list[data-vote-id="${oldVoteId}"]`).attr('data-vote-id', newVoteId);
+
+            // Update options
+            card.find(`.editable_options[data-vote-id="${oldVoteId}"]`).attr('data-vote-id', newVoteId);
+
+            // Update title
+            card.find(`#text_voteTitle_h2[data-vote-id="${oldVoteId}"]`).attr('data-vote-id', newVoteId);
+
+            // Update last modified element
+            card.find(`.p-last-modified[data-vote-id="${oldVoteId}"]`).attr('data-vote-id', newVoteId);
+
+            // Update vote options paragraphs
+            card.find(`.text_voteOptions_p[data-vote-id="${oldVoteId}"]`).attr('data-vote-id', newVoteId);
+        }
     }
 
     // Function to add a new editable option
@@ -340,30 +382,31 @@ $(document).ready(function () {
     }
 
     function fetchDateModified() {
+        const deferreds = [];
         $('.p-last-modified').each(function() {
             const element = $(this);
             const voteId = element.data('vote-id');
+            const deferred = $.Deferred();
+            deferreds.push(deferred);
             $.ajax({
                 url: '/api/vote/getDateModified',
                 method: 'GET',
                 data: { voteId: voteId },
                 success: function(response) {
                     element.attr('data-date-modified', response.dateModified);
-                    updateTimeAgo(element);
+                    deferred.resolve();
                 },
                 error: function(xhr, status, error) {
                     console.error('Error fetching date modified:', error);
+                    deferred.reject();
                 }
             });
         });
-    }
 
-    function updateTimeAgo(element) {
-        const dateModified = new Date(element.attr('data-date-modified'));
-        const timeAgoSpan = element.find('.time-ago');
-        timeAgoSpan.text(formatTimeAgo(dateModified));
+        $.when.apply($, deferreds).then(function() {
+            updateAllTimeAgo();
+        });
     }
-
 
     function formatTimeAgo(date) {
         const now = new Date();
@@ -378,9 +421,22 @@ $(document).ready(function () {
     }
 
     // Call updateTimeAgo initially
+    function updateAllTimeAgo() {
+        $('.p-last-modified').each(function() {
+            const element = $(this);
+            const dateModifiedAttr = element.attr('data-date-modified');
+            if (dateModifiedAttr) {
+                const dateModified = new Date(dateModifiedAttr);
+                const timeAgoSpan = element.find('.time-ago');
+                timeAgoSpan.text(formatTimeAgo(dateModified));
+            }
+        });
+    }
+
+// Call updateAllTimeAgo initially
     fetchDateModified();
 
-    // Update time ago every minute
-    setInterval(updateTimeAgo, 60000);
+// Update time ago every minute
+    setInterval(updateAllTimeAgo, 60000);
 
 });
