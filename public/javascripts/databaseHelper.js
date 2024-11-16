@@ -71,7 +71,6 @@ async function updateVote(userID, voteID, newVoteData) {
             } else {
                 return await insertNewVote(voteID, newVoteData);
             }
-
         } else {
             Object.assign(vote, newVoteData);
             vote.dateModified = new Date().toISOString();
@@ -270,7 +269,7 @@ async function getVoteStatistics(voteID) {
 }
 
 async function checkIfVoted(voteID, uid) {
-    console.log(`Checking if user ${userID} has voted for vote ${voteID}...`);
+    console.log(`Checking if user ${uid} has voted for vote ${voteID}...`);
 
     let vote = voteData.find(item => item.voteId === voteID);
     if (!vote) {
@@ -284,10 +283,14 @@ async function checkIfVoted(voteID, uid) {
         throw new Error(`Vote record with ID ${voteID} not found`);
     }
 
-    const hasVoted = voteRecord.voteStatistics.some(stat => stat.uid === userID);
+    const hasVoted = voteRecord.voteStatistics.some(stat => stat.uid === uid);
 
-    console.log(`User ${userID} has ${hasVoted ? '' : 'not '}voted for vote ${voteID}`);
+    console.log(`User ${uid} has ${hasVoted ? '' : 'not '}voted for vote ${voteID}`);
     return hasVoted;
+}
+
+async function getVoteById(voteId) {
+    return voteData.find(vote => vote.voteId === voteId);
 }
 
 async function saveToUserDatabase() {
@@ -495,6 +498,7 @@ export {
     changeUserPassword,
     changeUserEmail,
     createNewUser,
+    checkIfVoted,
     voteForOptions,
     getVoteStatistics,
     removeVoteEntry,
@@ -506,5 +510,6 @@ export {
     saveToVoteDatabase,
     saveToVoteRecordDatabase,
     rearrangeVoteJSONEntry,
-    getVoteData
+    getVoteData,
+    getVoteById
 };

@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
+    <title>Vibe Home</title>
     <meta charset="UTF-8">
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
@@ -9,8 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Young+Serif&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    <script
+            src="https://code.jquery.com/jquery-3.7.1.js"
+            integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
             crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
             integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
@@ -20,151 +22,40 @@
             crossorigin="anonymous"></script>
     <!-- Ensure voteCard.css is loaded after Bootstrap to override its styles -->
     <link rel="stylesheet" href="/stylesheets/voteCard.css">
-    <title>Document</title>
+    <script src="/javascripts/voteUtils.js"></script>
+    <script src="/javascripts/indexHelper.js"></script>
 </head>
 <body>
-<%- include('navbar') %>
+<%- include('navbar', {currentPage: "Feed"}) %>
 <section id="section_voteCard_container" style="opacity: 0">
     <div id="container">
-        <% for (let vote of voteData) { %>
+        <% voteData.forEach(function(vote) { %>
             <div class="card" id="vote_card" data-vote-id="<%= vote.voteId %>">
-                <h2 id="text_voteTitle_h2"><%= vote.voteTitle %></h2>
-                <% for (let voteOptions of vote.voteOptions) { %>
-                    <p class="text_voteOptions_p" data-option-id="<%= voteOptions.id %>" data-vote-id="<%= vote.voteId %>"><%= voteOptions.name %></p>
-                <% } %>
+                <h2 id="text_voteTitle_h2" data-vote-id="<%= vote.voteId %>"><%= vote.voteTitle %></h2>
+                <div id="vote_option_list" data-vote-id="<%= vote.voteId %>">
+                    <% vote.voteOptions.forEach(function(option) { %>
+                        <p class="text_voteOptions_p <%= userVotes[vote.voteId] ? 'voted' : '' %>"
+                           data-vote-id="<%= vote.voteId %>"
+                           data-option-id="<%= option.id %>">
+                            <%= option.name %>
+                            <% if (userVotes[vote.voteId]) { %>
+                                <span class="vote-percentage">
+                                    <%= userVotes[vote.voteId].options[option.id].percentage.toFixed(1) %>%
+                                </span>
+                            <% } %>
+                        </p>
+                    <% }); %>
+                </div>
             </div>
-        <% } %>
+        <% }); %>
     </div>
 </section>
 
 <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
 <script src="https://unpkg.com/imagesloaded@5/imagesloaded.pkgd.min.js"></script>
-<script src="/public/javascripts/voteUtils.js"></script>
-<script type="module">
-    // This one is for enable resizing the cards when window is resized
-
-    document.addEventListener('DOMContentLoaded', function () {
-        var container = document.querySelector('#container');
-        var msnry;
-
-        function initMasonry() {
-            if (msnry) {
-                msnry.destroy();
-            }
-
-            var containerWidth = container.offsetWidth;
-            var cardWidth = 400; // Fixed card width
-            var gutter = 20; // Gutter width
-            var columns = Math.floor((containerWidth + gutter) / (cardWidth + gutter));
-            columns = Math.min(Math.max(columns, 1), 4); // Ensure between 1 and 4 columns
-
-            msnry = new Masonry(container, {
-                itemSelector: '.card',
-                columnWidth: cardWidth,
-                gutter: gutter,
-                fitWidth: true
-            });
-
-            // Set the container width to fit the columns exactly
-            container.style.width = (columns * (cardWidth + gutter) - gutter) + 'px';
-
-            msnry.layout();
-        }
-
-        // Initialize Masonry after all images have loaded
-        imagesLoaded(container, function () {
-            initMasonry();
-            // Fade in the content
-            document.querySelector('#section_voteCard_container').style.opacity = '1';
-        });
-
-        // Relayout Masonry on window resize
-        var resizeTimer;
-        window.addEventListener('resize', function () {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(initMasonry, 250);
-        });
-
-    });
-
-    //
-    // I found it difficult to move the logic to external file, so I will write here instead.
-    //
-
-    // Function to handle click event
-    async function clickHandler() {
-        const voteID = this.parentElement.getAttribute('data-vote-id');
-        const optionID = this.getAttribute('data-option-id');
-
-        // Disable listeners for all options with the same voteID
-        disableListeners(voteID, optionID);
-
-        // Show alert and notify the user
-        alert(`Submitting your vote for option ${optionID} on voteID ${voteID}...`);
-
-        try {
-            // Send vote data to server using fetch
-            const response = await fetch('/api/vote/vote-for-options', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ voteID: voteID, voteOptionID: optionID }),
-            });
-
-            if (!response.ok) {
-                throw new Error(`Server error: ${response.status}`);
-            }
-
-            const data = await response.json();
-            console.log('Vote submission successful:', data);
-
-            // Display success message
-            alert('Vote submitted successfully!');
-        } catch (error) {
-            console.error('Error submitting vote:', error);
-            alert('There was an error submitting your vote. Please try again.');
-        }
-    }
-
-    // Function to disable all click event listeners for siblings
-    function disableListeners(voteID, clickedOptionID) {
-        // Find all <p> elements that have the same data-vote-id attribute
-        const options = document.querySelectorAll(`.text_voteOptions_p[data-vote-id="${voteID}"]`);
-
-        // Remove click event listeners from all matching elements
-        options.forEach(option => {
-            const optionID = option.getAttribute('data-option-id');
-
-            if (optionID === clickedOptionID) {
-                // Add 'clicked_selected' class to the clicked option
-                option.classList.add('clicked_selected');
-            } else {
-                // Add 'clicked_not_selected' class to all siblings that weren't clicked
-                option.classList.add('clicked_not_selected');
-            }
-
-            // Disable the click event listener
-            option.removeEventListener('click', clickHandler);
-        });
-    }
-
-    // Add event listeners to all options
-    function initializeListeners() {
-        const options = document.querySelectorAll('.text_voteOptions_p');
-        options.forEach(option => {
-            option.addEventListener('click', clickHandler);
-        });
-    }
-
-    // Initialize event listeners when the page is loaded
-    document.addEventListener('DOMContentLoaded', () => {
-        initializeListeners();
-    });
-
-
-
-</script>
-
 </body>
+<script>
+    window.isAuthenticated = <%= isAuthenticated %>;
+    window.userVotes = <%- JSON.stringify(userVotes) %>;
+</script>
 </html>

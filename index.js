@@ -259,11 +259,38 @@ app.post("/api/vote/getStat", async (req, res) => {
     console.log(await databaseHelper.getVoteStatistics("34fbbae8-1a62-4a76-95a5-6fef4822bd11"));
 });
 
+app.get("/api/vote/getDateModified", async (req, res) => {
+    const voteId = req.query.voteId;
+    try {
+        const vote = await databaseHelper.getVoteById(voteId);
+        if (vote) {
+            res.json({ dateModified: vote.dateModified });
+        } else {
+            res.status(404).json({ error: "Vote not found" });
+        }
+    } catch (error) {
+        console.error("Error fetching vote date modified:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
 // Fallback route should be placed at the end
 app.get("*", async (req, res) => {
     try {
         const voteData = await databaseHelper.getVoteData();
-        res.render("index", {voteData: voteData});
+        const userVotes = {};
+
+        if (req.session.authenticated) {
+            for (const vote of voteData) {
+                const hasVoted = await databaseHelper.checkIfVoted(vote.voteId, req.session.uid);
+                if (hasVoted) {
+                    const stats = await databaseHelper.getVoteStatistics(vote.voteId);
+                    userVotes[vote.voteId] = stats;
+                }
+            }
+        }
+
+        res.render("index", {voteData: voteData, userVotes: userVotes, isAuthenticated: req.session.authenticated});
     } catch (error) {
         console.error("Error fetching vote data:", error);
         res.status(500).send("Error fetching vote data");

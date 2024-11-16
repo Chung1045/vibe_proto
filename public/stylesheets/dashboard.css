@@ -14,6 +14,10 @@
     background-color: #bab9b9;
 }
 
+.p-last-modified{
+    margin: auto auto auto 0;
+}
+
 .editable_title {
     margin-right: 15px;
     padding: 10px 15px;

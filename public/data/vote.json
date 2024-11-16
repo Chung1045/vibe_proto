@@ -1,1 +1,102 @@
-[]
+[
+  {
+    "voteId": "c9f06085-768f-4404-952d-35c3896172be",
+    "authorUid": "a4e4a04c-0b99-4c3a-9a8d-ea62ba61974f",
+    "dateModified": "2024-11-16T13:21:27.197Z",
+    "voteTitle": "Write your Vote Title here",
+    "voteOptions": [
+      {
+        "id": "1",
+        "name": "Option 1"
+      },
+      {
+        "id": "2",
+        "name": "Option 2"
+      }
+    ]
+  },
+  {
+    "voteId": "2dbe6bfe-f284-413f-ae73-d36df7610226",
+    "authorUid": "a4e4a04c-0b99-4c3a-9a8d-ea62ba61974f",
+    "dateModified": "2024-11-16T13:21:24.790Z",
+    "voteTitle": "What Laptop to buy?",
+    "voteOptions": [
+      {
+        "id": "1",
+        "name": "MacBook Pro 14 base version"
+      },
+      {
+        "id": "2",
+        "name": "Surface Laptop 7"
+      }
+    ]
+  },
+  {
+    "voteId": "0dd532c9-67ae-447c-b7aa-c36f8b5004d9",
+    "authorUid": "a4e4a04c-0b99-4c3a-9a8d-ea62ba61974f",
+    "dateModified": "2024-11-16T13:21:23.191Z",
+    "voteTitle": "Write your Vote Title here",
+    "voteOptions": [
+      {
+        "id": "1",
+        "name": "Option 1"
+      },
+      {
+        "id": "2",
+        "name": "Option 2"
+      },
+      {
+        "id": "3",
+        "name": "Option 3"
+      }
+    ]
+  },
+  {
+    "voteId": "1116a574-db11-4ff0-9626-bc2659b5f771",
+    "authorUid": "a4e4a04c-0b99-4c3a-9a8d-ea62ba61974f",
+    "dateModified": "2024-11-16T13:29:55.567Z",
+    "voteTitle": "Write your Vote Title here",
+    "voteOptions": [
+      {
+        "id": "1",
+        "name": "Option 1"
+      },
+      {
+        "id": "2",
+        "name": "Option 2"
+      }
+    ]
+  },
+  {
+    "voteId": "334eed25-368b-4ddc-b030-372bcb58e840",
+    "authorUid": "a4e4a04c-0b99-4c3a-9a8d-ea62ba61974f",
+    "dateModified": "2024-11-16T13:21:19.351Z",
+    "voteTitle": "Write your Vote Title here",
+    "voteOptions": [
+      {
+        "id": "1",
+        "name": "Option 1"
+      },
+      {
+        "id": "2",
+        "name": "Option 2"
+      }
+    ]
+  },
+  {
+    "voteId": "c7e5742f-81ce-498f-b1f5-386e56e2724b",
+    "authorUid": "a4e4a04c-0b99-4c3a-9a8d-ea62ba61974f",
+    "dateModified": "2024-11-16T13:21:30.882Z",
+    "voteTitle": "Write your Vote Title here",
+    "voteOptions": [
+      {
+        "id": "1",
+        "name": "Option 1"
+      },
+      {
+        "id": "2",
+        "name": "Option 2"
+      }
+    ]
+  }
+]

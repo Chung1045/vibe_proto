@@ -27,7 +27,7 @@
     <title>Vibe Dashboard</title>
 </head>
 <body>
-<%- include('navbar') %>
+<%- include('navbar', {currentPage: "Dashboard"}) %>
 <section id="section_voteCard_container" style="opacity: 0">
     <div id="container">
         <% for (let vote of voteData) { %>
@@ -40,6 +40,7 @@
                     <% } %>
                 </div>
                 <div class="d-flex justify-content-end" id="div_container_action_button">
+                    <p class="p-last-modified" data-vote-id="<%= vote.voteId %>"><span class="time-ago"></span></p>
                     <img src="/images/icns/trash-fill.svg" alt="icon" id="btn-delete">
                     <img src="/images/icns/pencil-square.svg" alt="icon" id="btn-edit">
                 </div>

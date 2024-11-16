@@ -39,6 +39,7 @@ $(document).ready(function () {
         </div>
         <div class="div-edit-options"><hr class="editable_hr"><div class="editable_addOptions">Add new options</div></div>
         <div class="d-flex justify-content-end" id="div_container_action_button">
+        <p class="p-last-modified" data-vote-id="<%= vote.voteId %>"><span class="time-ago"></span></p>
             <img src="/images/icns/trash-fill.svg" alt="icon" id="btn-delete">
             <img src="/images/icns/check2.svg" alt="icon" id="btn-save-changes">
         </div>
@@ -187,6 +188,20 @@ $(document).ready(function () {
             contentType: 'application/json',
             success: function(response) {
                 console.log('Vote updated successfully:', response);
+                // Fetch the updated dateModified
+                const lastModifiedElement = $(`.p-last-modified[data-vote-id="${voteData.voteId}"]`);
+                $.ajax({
+                    url: '/api/vote/getDateModified',
+                    method: 'GET',
+                    data: { voteId: voteData.voteId },
+                    success: function(dateResponse) {
+                        lastModifiedElement.attr('data-date-modified', dateResponse.dateModified);
+                        updateTimeAgo(lastModifiedElement);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching updated date modified:', error);
+                    }
+                });
                 // You can add a visual feedback here, like a toast notification
             },
             error: function(xhr, status, error) {
@@ -323,5 +338,49 @@ $(document).ready(function () {
             $grid.masonry('layout');
         });
     }
+
+    function fetchDateModified() {
+        $('.p-last-modified').each(function() {
+            const element = $(this);
+            const voteId = element.data('vote-id');
+            $.ajax({
+                url: '/api/vote/getDateModified',
+                method: 'GET',
+                data: { voteId: voteId },
+                success: function(response) {
+                    element.attr('data-date-modified', response.dateModified);
+                    updateTimeAgo(element);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching date modified:', error);
+                }
+            });
+        });
+    }
+
+    function updateTimeAgo(element) {
+        const dateModified = new Date(element.attr('data-date-modified'));
+        const timeAgoSpan = element.find('.time-ago');
+        timeAgoSpan.text(formatTimeAgo(dateModified));
+    }
+
+
+    function formatTimeAgo(date) {
+        const now = new Date();
+        const diffInSeconds = Math.floor((now - date) / 1000);
+
+        if (diffInSeconds < 60) return 'now';
+        if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m`;
+        if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h`;
+        if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)}d`;
+        if (diffInSeconds < 31536000) return `${Math.floor(diffInSeconds / 2592000)}mo`;
+        return `${Math.floor(diffInSeconds / 31536000)} yr`;
+    }
+
+    // Call updateTimeAgo initially
+    fetchDateModified();
+
+    // Update time ago every minute
+    setInterval(updateTimeAgo, 60000);
 
 });
