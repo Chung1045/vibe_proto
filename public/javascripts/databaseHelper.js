@@ -324,6 +324,21 @@ async function getVoteById(voteId) {
     return voteData.find(vote => vote.voteId === voteId);
 }
 
+async function getVoteAuthor(voteID) {
+    const vote = voteData.find(vote => vote.voteId === voteID);
+    if (!vote) {
+        throw new Error(`Vote with ID ${voteID} not found`);
+    }
+
+    const author = userData.find(user => user.uid === vote.authorUid);
+    if (!author) {
+        throw new Error(`Author with UID ${vote.authorUid} not found`);
+    }
+
+    console.log('Found author username:', author.username);
+    return author.username;
+}
+
 async function saveToUserDatabase() {
     const filepath = path.join(__dirname, '..', '..', 'public/data/user.json');
     return writeJsonFile(filepath, userData);
@@ -543,5 +558,6 @@ export {
     rearrangeVoteJSONEntry,
     getVoteData,
     getVoteById,
-    getVotedOption
+    getVotedOption,
+    getVoteAuthor
 };

@@ -297,8 +297,24 @@ app.post("/api/vote/get-vote-option", async (req, res) => {
     }
 });
 
-app.get("/api/vote/getDateModified", async (req, res) => {
-    const voteId = req.query.voteId;
+app.post("/api/vote/get-vote-author", async (req, res) => {
+    const voteId = req.body.voteId;
+    console.log("Fetching vote author for voteId:", voteId);
+    if (!voteId) {
+        return res.status(400).json({ error: "voteId is required" });
+    }
+
+    try{
+        const voteAuthor = await databaseHelper.getVoteAuthor(voteId);
+        console.log("Vote author:", voteAuthor);
+        res.json({ voteAuthor });
+    } catch (error) {
+        console.error("Error fetching vote author:", error);
+    }
+});
+
+app.post("/api/vote/getDateModified", async (req, res) => {
+    const voteId = req.body.voteId; // Changed from req.query.voteId to req.body.voteId
     try {
         const vote = await databaseHelper.getVoteById(voteId);
         if (vote) {

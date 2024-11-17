@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ voteId: voteId }),
+                    body: JSON.stringify({voteId: voteId}),
                 }).then(response => {
                     if (!response.ok) {
                         throw new Error(`Failed to fetch vote results: ${response.status}`);
@@ -206,38 +206,57 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log('Number of vote cards:', voteCards.length);
 
         for (const card of voteCards) {
-            const voteID = card.dataset.voteId;
-            const options = card.querySelectorAll('.text_voteOptions_p');
+            try {
+                const voteID = card.dataset.voteId;
+                const options = card.querySelectorAll('.text_voteOptions_p');
 
-            console.log('Processing vote card:', {voteID, optionsCount: options.length});
+                console.log('Processing vote card:', {voteID, optionsCount: options.length});
 
-            const hasVoted = await checkIfVoted(voteID);
+                // Use Promise.all to run these fetch operations in parallel
+                const [author, lastUpdate, hasVoted] = await Promise.all([
+                    getVoteAuthor(voteID),
+                    getVoteLastUpdate(voteID),
+                    checkIfVoted(voteID)
+                ]);
 
-            console.log('Has voted:', hasVoted);
+                card.querySelector('.text_voteAuthorName_p').textContent = author || 'Unknown Author';
+                card.querySelector('.text_voteLastUpdated_p').textContent = lastUpdate || '---'
 
-            if (hasVoted) {
-                console.log('Updating display for voted card:', voteID);
-                await updateVoteDisplay(card);
-            } else {
-                console.log('Adding click listeners for non-voted card:', voteID);
-                options.forEach(option => {
-                    // Remove any existing listeners first
-                    option.removeEventListener('click', handleVoteClick);
-                    // Add new click listener
-                    option.addEventListener('click', handleVoteClick);
-                });
+                // Assuming you have an element to display the last update
+                const lastUpdateElement = card.querySelector('.text_voteLastUpdate');
+                if (lastUpdateElement) {
+                    lastUpdateElement.textContent = lastUpdate || 'Unknown';
+                }
+
+                console.log('Has voted:', hasVoted);
+
+                if (hasVoted) {
+                    console.log('Updating display for voted card:', voteID);
+                    await updateVoteDisplay(card);
+                } else {
+                    console.log('Adding click listeners for non-voted card:', voteID);
+                    options.forEach(option => {
+                        // Remove any existing listeners first
+                        option.removeEventListener('click', handleVoteClick);
+                        // Add new click listener
+                        option.addEventListener('click', handleVoteClick);
+                    });
+                }
+            } catch (error) {
+                console.error('Error processing vote card:', error);
+                // Handle the error appropriately, maybe display an error message on the card
             }
         }
     }
 
-    async function getUserVotedOption(voteId) {
+    async function getUserVotedOption(voteID) {
         try {
             const response = await fetch('/api/vote/get-vote-option', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ voteId: voteId }),
+                body: JSON.stringify({voteId: voteID}),
             });
 
             if (!response.ok) {
@@ -255,6 +274,89 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Error getting user voted option:', error);
             return null;
         }
+    }
+
+    async function getVoteAuthor(voteID) {
+        try {
+            console.log("Checking vote author for voteId:", voteID);
+            const response = await fetch(`/api/vote/get-vote-author`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({voteId: voteID})
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            const voteAuthor = data.voteAuthor;
+            console.log(`Vote Author for voteID ${voteID}: ${voteAuthor}`);
+
+            return voteAuthor; // Return the author's username
+        } catch (error) {
+            console.error('Error fetching vote author:', error);
+            throw error; // Re-throw the error if you want calling code to handle it
+        }
+    }
+
+    async function getVoteLastUpdate(voteID) {
+        try {
+            console.log("Checking vote last update for voteId:", voteID);
+            const response = await fetch(`/api/vote/getDateModified`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({voteId: voteID})
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log("Raw data received:", data);
+            const voteLastModified = data.dateModified;
+            console.log(`Vote last modified for voteID ${voteID}: ${voteLastModified}`);
+            console.log("Type of voteLastModified:", typeof voteLastModified);
+
+            const date = new Date(voteLastModified);
+            console.log("Parsed date:", date);
+            console.log("Is valid date:", !isNaN(date.getTime()));
+
+            const timeSince = calcTimeSince(voteLastModified);
+            console.log(`Time since last modification: ${timeSince}`);
+
+            return timeSince;
+        } catch (error) {
+            console.error('Error fetching vote last update:', error);
+            return '---'; // indicate that the time since cannot be updated
+        }
+    }
+
+    function calcTimeSince(dateString) {
+        console.log("Input to calcTimeSince:", dateString);
+        const date = new Date(dateString);
+        console.log("Parsed date in calcTimeSince:", date);
+        if (isNaN(date.getTime())) {
+            console.error('Invalid date:', dateString);
+            return 'Unknown';
+        }
+
+        const now = new Date();
+        console.log("Current date:", now);
+        const diffInSeconds = Math.floor((now - date) / 1000);
+        console.log("Difference in seconds:", diffInSeconds);
+
+        if (diffInSeconds < 60) return 'now';
+        if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m`;
+        if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h`;
+        if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)}d`;
+        if (diffInSeconds < 31536000) return `${Math.floor(diffInSeconds / 2592000)}mo`;
+        return `${Math.floor(diffInSeconds / 31536000)}yr`;
     }
 
     // Initialize everything

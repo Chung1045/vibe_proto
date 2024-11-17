@@ -390,7 +390,7 @@ $(document).ready(function () {
             deferreds.push(deferred);
             $.ajax({
                 url: '/api/vote/getDateModified',
-                method: 'GET',
+                method: 'POST',
                 data: { voteId: voteId },
                 success: function(response) {
                     element.attr('data-date-modified', response.dateModified);
