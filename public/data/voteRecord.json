@@ -1,4 +1,61 @@
-[  {
-  "voteId": "1234567890",
-  "voteStatistics": [{"uid": "1234567890", "vote": "1"}, {"uid": "1234567891", "vote": "2"}]
-}]
+[
+  {
+    "voteId": "1234567890",
+    "voteStatistics": [
+      {
+        "uid": "1234567890",
+        "vote": "1"
+      },
+      {
+        "uid": "1234567891",
+        "vote": "2"
+      }
+    ]
+  },
+  {
+    "voteId": "cb18cec3-74b1-437b-a197-034662bd6ef0",
+    "voteStatistics": []
+  },
+  {
+    "voteId": "5dbbfd66-d207-423c-b5af-d23ef1e5233e",
+    "voteStatistics": []
+  },
+  {
+    "voteId": "f74c61bb-57cf-4e44-9fb4-fc671d6800cb",
+    "voteStatistics": []
+  },
+  {
+    "voteId": "ae9d8cbd-8a5d-4ac6-8534-23c520a05408",
+    "voteStatistics": []
+  },
+  {
+    "voteId": "20f001f3-54b0-44dc-bb96-c8e6a593954d",
+    "voteStatistics": []
+  },
+  {
+    "voteId": "fcb70ee9-452a-41c6-9ea6-8dc96db161ea",
+    "voteStatistics": []
+  },
+  {
+    "voteId": "02822dd9-0630-4682-8dac-aee2021acd81",
+    "voteStatistics": []
+  },
+  {
+    "voteId": "7f4c70ce-f626-45bb-a4c0-a17b8cdc5aac",
+    "voteStatistics": [
+      {
+        "uid": "123456",
+        "vote": "1"
+      }
+    ]
+  },
+  {
+    "voteId": "32c6a361-534e-494b-92ff-b1b087abd0be",
+    "voteStatistics": [
+      {
+        "uid": "123456",
+        "vote": "1"
+      }
+    ]
+  }
+]

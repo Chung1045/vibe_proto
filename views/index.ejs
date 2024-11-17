@@ -92,13 +92,39 @@
     //
 
     // Function to handle click event
-    function clickHandler() {
+    async function clickHandler() {
         const voteID = this.parentElement.getAttribute('data-vote-id');
         const optionID = this.getAttribute('data-option-id');
-        alert(`You are now on VoteID ${voteID}\nYou clicked option ${optionID}`);
 
         // Disable listeners for all options with the same voteID
         disableListeners(voteID, optionID);
+
+        // Show alert and notify the user
+        alert(`Submitting your vote for option ${optionID} on voteID ${voteID}...`);
+
+        try {
+            // Send vote data to server using fetch
+            const response = await fetch('/api/vote/vote-for-options', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ voteID: voteID, voteOptionID: optionID }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('Vote submission successful:', data);
+
+            // Display success message
+            alert('Vote submitted successfully!');
+        } catch (error) {
+            console.error('Error submitting vote:', error);
+            alert('There was an error submitting your vote. Please try again.');
+        }
     }
 
     // Function to disable all click event listeners for siblings
