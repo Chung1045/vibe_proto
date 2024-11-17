@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Young+Serif&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&family=Young+Serif&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibe| The most security and enagaging online voting system</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header {
+            font-family: 'Young Serif', serif;
+            background-color: #606060;
+            color: white;
+            padding: 20px;
+            text-align: left;
+        }
+        main {
+            font-family: 'Inter Tight', sans-serif;
+            flex: 1;
+            padding: 20px;
+            text-align: left;
+        }
+        footer {
+            font-family: 'Inter Tight', sans-serif;
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+        }
+        button {
+            font-family: 'Inter Tight', sans-serif;
+            padding: 10px 20px;
+            background-color: #606060;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        @media (max-width: 600px) {
+            header, footer {
+                font-size: 14px;
+            }
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Welcome to Vibe</h1>
+        <h3>Online Voting System</h3>
+    </header>
+
+    <main>
+        <h2>Features</h2>
+        <h3>Security</h3><p>Encrypted communication, secure authentication, and tamper-evident audit trails work together to create a trustworthy and reliable voting system.</p>
+        <h3>Engagement</h3><p>Making the voting process as accessible and user-friendly as possible. Thought and effort have been put into creating an intuitive interface that guides voters through the process step-by-step, with clear instructions and helpful information at every stage.</p>
+        <button id="alertButton">Start by Login</button>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 S350F Vibe</p>
+    </footer>
+
+    <script>
+        document.getElementById('alertButton').addEventListener('click', function() {
+            alert('Button was clicked!');
+        });
+    </script>
+</body>
+</html>
