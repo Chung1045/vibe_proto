@@ -17,17 +17,17 @@
   },
   {
     "voteId": "33e36325-5485-4567-927e-033cc1cd25bf",
-    "authorUid": "a4e4a04c-0b99-4c3a-9a8d-ea62ba61974f",
-    "dateModified": "2024-11-16T15:15:33.897Z",
+    "authorUid": "ca944b4e-fbcf-4ca8-b6ec-9085bdefa6c1",
+    "dateModified": "2024-11-17T15:09:08.406Z",
     "voteTitle": "Write your Vote Title here",
     "voteOptions": [
       {
         "id": "1",
-        "name": "Option 1"
+        "name": "New option"
       },
       {
         "id": "2",
-        "name": "Option 2"
+        "name": "New option"
       }
     ]
   },
@@ -50,16 +50,16 @@
   {
     "voteId": "4a79c2c9-dbe6-4969-989b-1d2ad12ef37b",
     "authorUid": "ca944b4e-fbcf-4ca8-b6ec-9085bdefa6c1",
-    "dateModified": "2024-11-16T15:40:20.761Z",
+    "dateModified": "2024-11-17T15:08:50.585Z",
     "voteTitle": "Write your Vote Title here",
     "voteOptions": [
       {
         "id": "1",
-        "name": "Option 1"
+        "name": "New option"
       },
       {
         "id": "2",
-        "name": "Option 2"
+        "name": "New option2"
       }
     ]
   },

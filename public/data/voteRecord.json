@@ -18,20 +18,7 @@
   },
   {
     "voteId": "33e36325-5485-4567-927e-033cc1cd25bf",
-    "voteStatistics": [
-      {
-        "uid": "a4e4a04c-0b99-4c3a-9a8d-ea62ba61974f",
-        "vote": "1"
-      },
-      {
-        "uid": "46866dc6-b976-4404-b7b1-a21757ce2c2d",
-        "vote": "1"
-      },
-      {
-        "uid": "ca944b4e-fbcf-4ca8-b6ec-9085bdefa6c1",
-        "vote": "2"
-      }
-    ]
+    "voteStatistics": []
   },
   {
     "voteId": "03696c24-f9b5-4eb1-8e77-a6facf676953",
@@ -52,12 +39,7 @@
   },
   {
     "voteId": "4a79c2c9-dbe6-4969-989b-1d2ad12ef37b",
-    "voteStatistics": [
-      {
-        "uid": "ca944b4e-fbcf-4ca8-b6ec-9085bdefa6c1",
-        "vote": "1"
-      }
-    ]
+    "voteStatistics": []
   },
   {
     "voteId": "ebcc356b-3ba1-4752-86bd-e942d6836a99",

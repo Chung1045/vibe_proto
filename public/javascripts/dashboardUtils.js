@@ -168,7 +168,9 @@ $(document).ready(function () {
         const options = card.find('.text_voteOptions_p').map(function() {
             return {
                 id: $(this).attr('data-option-id'),
-                name: $(this).text()
+                name: $(this).contents().filter(function() {
+                    return this.nodeType === 3;
+                }).text().trim()
             };
         }).get();
 
@@ -193,11 +195,16 @@ $(document).ready(function () {
                     console.log(isNewVote ? 'Vote created successfully:' : 'Vote updated successfully:', response);
 
                     const newVoteId = response.voteID || response.vote.voteId;
+                    const card = $(`.card[data-vote-id="${isNewVote ? 'new-temporarily' : voteData.voteId}"]`);
+
                     if (isNewVote && newVoteId) {
                         updateVoteId('new-temporarily', newVoteId);
                     }
 
-                    const lastModifiedElement = $(`.p-last-modified[data-vote-id="${newVoteId}"]`);
+                    // Update card content
+                    updateCardContent(card, voteData, newVoteId);
+
+                    const lastModifiedElement = card.find('.p-last-modified');
                     if (response.vote && response.vote.dateModified) {
                         lastModifiedElement.attr('data-date-modified', response.vote.dateModified);
                         updateAllTimeAgo();
@@ -217,7 +224,9 @@ $(document).ready(function () {
                         });
                     }
 
-                    // You can add a visual feedback here, like a toast notification
+                    // Recalculate Masonry layout
+                    $grid.masonry('layout');
+
                 } else {
                     console.error(isNewVote ? 'Error creating vote:' : 'Error updating vote:', response.message);
                     // Handle the error, maybe show an error message to the user
@@ -236,19 +245,10 @@ $(document).ready(function () {
             // Update card
             card.attr('data-vote-id', newVoteId);
 
-            // Update vote option list
             card.find(`#vote_option_list[data-vote-id="${oldVoteId}"]`).attr('data-vote-id', newVoteId);
-
-            // Update options
             card.find(`.editable_options[data-vote-id="${oldVoteId}"]`).attr('data-vote-id', newVoteId);
-
-            // Update title
             card.find(`#text_voteTitle_h2[data-vote-id="${oldVoteId}"]`).attr('data-vote-id', newVoteId);
-
-            // Update last modified element
             card.find(`.p-last-modified[data-vote-id="${oldVoteId}"]`).attr('data-vote-id', newVoteId);
-
-            // Update vote options paragraphs
             card.find(`.text_voteOptions_p[data-vote-id="${oldVoteId}"]`).attr('data-vote-id', newVoteId);
         }
     }
@@ -260,18 +260,16 @@ $(document).ready(function () {
         let newOption = $('<div contenteditable />').addClass('editable_options').text('New option');
         let deleteIcon = $('<img/>').attr('src', '/images/icns/trash-fill.svg').addClass('delete-option-icon');
 
-        // Append the option and the delete icon to the wrapper
         newOptionWrapper.append(newOption, deleteIcon);
         optionsList.append(newOptionWrapper);
 
-        // Handle input for the new option
         newOption.on('input', function () {
-            $grid.masonry('layout'); // Recalculate layout when input changes
+            $grid.masonry('layout');
         });
 
         deleteIcon.on('click', function () {
             newOptionWrapper.remove();
-            $grid.masonry('layout'); // Update Masonry layout
+            $grid.masonry('layout');
             checkOptionsCount(optionsList);
         });
 
@@ -300,24 +298,19 @@ $(document).ready(function () {
         let newOptionsBt = $('<div/>').text("Add new options").addClass("editable_addOptions");
         let horizontalRule = $('<hr/>').addClass("editable_hr");
 
-        // Make title editable
         makeElementEditable(title, parentElement);
 
-        // Make options editable
         options.each(function () {
             makeOptionEditable($(this), voteID);
         });
 
 
-        // Append the "Add new options" button after the options list
         divEditOptions.append(horizontalRule, newOptionsBt);
         optionsList.after(divEditOptions);
 
-        // Change edit button icon
         editButton.attr('src', '/images/icns/check2.svg');
         editButton.attr('id', 'btn-save-changes');
 
-        // Check and update delete button visibility
         checkOptionsCount(optionsList);
     }
 
@@ -350,7 +343,9 @@ $(document).ready(function () {
 
     // Function to make an option editable
     function makeOptionEditable(option, voteID) {
-        let currentText = option.text();
+        let currentText = option.contents().filter(function() {
+            return this.nodeType === 3; // Get only the text node
+        }).text().trim(); // Get the text content without the percentage
         let originalStyles = option.attr('style');
         let optionId = option.attr('data-option-id');
 
@@ -363,6 +358,12 @@ $(document).ready(function () {
             .attr('data-option-id', optionId)
             .attr('data-vote-id', voteID)
             .css({'display': 'block'});
+
+        // Preserve the percentage span if it exists
+        let percentageSpan = option.find('.vote-percentage');
+        if (percentageSpan.length) {
+            inputElement.after(percentageSpan);
+        }
 
         optionWrapper.append(inputElement, deleteIcon);
         option.replaceWith(optionWrapper);
@@ -433,10 +434,159 @@ $(document).ready(function () {
         });
     }
 
+    async function getVoteStatistics(voteID) {
+        try {
+            const response = await fetch('/api/vote/getStat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({voteId: voteID}),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch vote results: ${response.status}`);
+            }
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching vote statistics:', error);
+            return null;
+        }
+    }
+
+    function updateCardContent(card, voteData, newVoteId) {
+        // Update vote ID
+        card.attr('data-vote-id', newVoteId);
+
+        // Update title
+        card.find('#text_voteTitle_h2').text(voteData.voteTitle).attr('data-vote-id', newVoteId);
+
+        // Update options
+        const optionsList = card.find('#vote_option_list');
+        optionsList.attr('data-vote-id', newVoteId);
+
+        // Clear existing options
+        optionsList.empty();
+
+        // Add updated options
+        voteData.voteOptions.forEach((option) => {
+            const optionElement = $('<p>')
+                .addClass('text_voteOptions_p')
+                .attr({
+                    'data-vote-id': newVoteId,
+                    'data-option-id': option.id
+                });
+
+            // Add the option text as a text node
+            optionElement.append(document.createTextNode(option.name));
+
+            // Add the percentage span
+            const percentageSpan = $('<span>').addClass('vote-percentage').text('0%');
+            optionElement.append(percentageSpan);
+
+            optionsList.append(optionElement);
+        });
+
+        // Update edit button
+        card.find('#btn-save-changes').attr({
+            'src': '/images/icns/pencil-square.svg',
+            'id': 'btn-edit'
+        });
+
+        // Trigger an update of the vote display
+        updateVoteDisplay(card);
+    }
+
+    async function updateVoteDisplay(card) {
+        // Convert to jQuery object if it's not already one
+        const $card = $(card);
+        const voteID = $card.attr('data-vote-id');
+
+        // If voteID is 'new-temporarily', skip updating as it won't have statistics yet
+        if (voteID === 'new-temporarily') {
+            console.log('Skipping update for new vote card');
+            return;
+        }
+
+        const options = $card.find('.text_voteOptions_p');
+
+        try {
+            const voteResults = await getVoteStatistics(voteID);
+
+            if (!voteResults || typeof voteResults.options !== 'object') {
+                console.log('No vote results available for', voteID);
+                resetVoteStatistics($card);
+                return;
+            }
+
+            const hasVotes = Object.values(voteResults.options).some(option => option.percentage > 0);
+
+            if (hasVotes) {
+                $card.addClass('voted');
+            } else {
+                $card.removeClass('voted');
+            }
+
+            let maxPercentage = 0;
+            let maxOptionId = null;
+
+            options.each(function() {
+                const option = $(this);
+                const optionID = option.data('option-id');
+                const optionResult = voteResults.options[optionID];
+
+                let percentageSpan = option.find('.vote-percentage');
+                if (percentageSpan.length === 0) {
+                    percentageSpan = $('<span class="vote-percentage"></span>');
+                    option.append(percentageSpan);
+                }
+
+                if (hasVotes && optionResult) {
+                    const percentage = optionResult.percentage.toFixed(1);
+                    percentageSpan.text(`${percentage}%`);
+                    option.css('--option-percentage', `${percentage}%`);
+
+                    if (optionResult.percentage > maxPercentage) {
+                        maxPercentage = optionResult.percentage;
+                        maxOptionId = optionID;
+                    }
+                } else {
+                    percentageSpan.text('0%');
+                    option.css('--option-percentage', '0%');
+                }
+            });
+
+            // Highlight the most voted option
+            options.each(function() {
+                const option = $(this);
+                if (option.data('option-id') === maxOptionId) {
+                    option.addClass('most-voted');
+                } else {
+                    option.removeClass('most-voted');
+                }
+            });
+
+        } catch (error) {
+            console.error('Error updating vote display:', error);
+            resetVoteStatistics($card);
+        }
+
+        // Recalculate Masonry layout
+        $grid.masonry('layout');
+    }
+
 // Call updateAllTimeAgo initially
     fetchDateModified();
 
 // Update time ago every minute
     setInterval(updateAllTimeAgo, 60000);
+
+    $('.card').each(function() {
+        const $card = $(this);
+        const voteID = $card.attr('data-vote-id');
+        if (voteID && voteID !== 'new-temporarily') {
+            updateVoteDisplay($card);
+        }
+    });
 
 });

@@ -36,7 +36,10 @@
                 <div id="vote_option_list" data-vote-id="<%= vote.voteId %>">
                     <% for (let voteOptions of vote.voteOptions) { %>
                         <p class="text_voteOptions_p" data-option-id="<%= voteOptions.id %>"
-                           data-vote-id="<%= vote.voteId %>"><%= voteOptions.name %></p>
+                           data-vote-id="<%= vote.voteId %>">
+                            <%= voteOptions.name %>
+                            <span class="vote-percentage"></span>
+                        </p>
                     <% } %>
                 </div>
                 <div class="d-flex justify-content-end" id="div_container_action_button">

@@ -109,6 +109,10 @@
     z-index: 2;
 }
 
+.most-voted::before {
+    background-color: rgba(117, 109, 214, 1);
+}
+
 .text_voteOptions_p.clicked_selected {
     background-color: rgba(117, 109, 214, 0.8);
     color: #ffffff;
