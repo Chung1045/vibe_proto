@@ -7,6 +7,7 @@ $(document).ready(function () {
         gutter: 20,
         fitWidth: true
     });
+
     function setElementVisibility(element, isVisible) {
         if (isVisible) {
             element.style.display = 'block';
@@ -29,7 +30,7 @@ $(document).ready(function () {
         let containerView = $('#container');
 
         if (isCreatingNewVote) {
-            alert('Please finish creating the current vote before starting a new one.');
+            showAlert('Please finish creating the current vote before starting a new one.', "warning")
             return;
         }
 
@@ -110,12 +111,12 @@ $(document).ready(function () {
                         voteId: voteID
                     }),
                     contentType: 'application/json',
-                    success: function(response) {
-                        console.log('Vote deleted successfully:', response);
+                    success: function (response) {
+                        showAlert('Vote deleted successfully.', "success");
                         checkVoteEntryNum();
                     },
-                    error: function(xhr, status, error) {
-                        console.error('Error deleting vote:', error);
+                    error: function (xhr, status, error) {
+                        showAlert(`Error deleting vote: ${error}`, "danger");
                     }
                 });
                 let voteEntry = document.querySelector(`.card[data-vote-id="${voteID}"]`);
@@ -131,7 +132,7 @@ $(document).ready(function () {
 
         // Collect edited data
         const newTitle = card.find('.editable_title').text();
-        const newOptions = card.find('.editable_options').map(function() {
+        const newOptions = card.find('.editable_options').map(function () {
             return $(this).text();
         }).get();
 
@@ -178,10 +179,10 @@ $(document).ready(function () {
     function extractVoteCardData(card) {
         const voteID = card.attr('data-vote-id');
         const title = card.find('#text_voteTitle_h2').text();
-        const options = card.find('.text_voteOptions_p').map(function() {
+        const options = card.find('.text_voteOptions_p').map(function () {
             return {
                 id: $(this).attr('data-option-id'),
-                name: $(this).contents().filter(function() {
+                name: $(this).contents().filter(function () {
                     return this.nodeType === 3;
                 }).text().trim()
             };
@@ -204,9 +205,14 @@ $(document).ready(function () {
                 method: 'POST',
                 data: JSON.stringify(voteData),
                 contentType: 'application/json',
-                success: function(response) {
+                success: function (response) {
                     if (response.success) {
                         console.log(isNewVote ? 'Vote created successfully:' : 'Vote updated successfully:', response);
+                        if (isNewVote) {
+                            showAlert("Vote created successfully", "success");
+                        } else {
+                            showAlert("Vote updated successfully", "success");
+                        }
 
                         const newVoteId = response.voteID || response.vote.voteId;
                         const card = $(`.card[data-vote-id="${isNewVote ? 'new-temporarily' : voteData.voteId}"]`);
@@ -228,13 +234,14 @@ $(document).ready(function () {
                             $.ajax({
                                 url: '/api/vote/getDateModified',
                                 method: 'GET',
-                                data: { voteId: newVoteId },
-                                success: function(dateResponse) {
+                                data: {voteId: newVoteId},
+                                success: function (dateResponse) {
                                     lastModifiedElement.attr('data-date-modified', dateResponse.dateModified);
                                     updateAllTimeAgo();
                                 },
-                                error: function(xhr, status, error) {
+                                error: function (xhr, status, error) {
                                     console.error('Error fetching updated date modified:', error);
+                                    showAlert(`Error fetching updated date modified:\n${error}`, "danger");
                                 }
                             });
                         }
@@ -244,13 +251,23 @@ $(document).ready(function () {
 
                         resolve(); // Resolve the promise on success
                     } else {
+                        if (isNewVote){
+                            showAlert(`Error creating new vote:\n${response.message}`, "danger")
+                        } else {
+                            showAlert(`Error updating vote:\n${response.message}`, "danger")
+                        }
                         console.error(isNewVote ? 'Error creating vote:' : 'Error updating vote:', response.message);
-                        reject(new Error(response.message)); // Reject the promise on error
+                        reject(new Error(response.message));
                     }
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     console.error(isNewVote ? 'Error creating vote:' : 'Error updating vote:', error);
-                    reject(error); // Reject the promise on AJAX error
+                    if (isNewVote){
+                        showAlert(`Error creating new vote:\n${response.message}`, "danger")
+                    } else {
+                        showAlert(`Error updating vote:\n${response.message}`, "danger")
+                    }
+                    reject(error);
                 }
             });
         });
@@ -361,7 +378,7 @@ $(document).ready(function () {
 
     // Function to make an option editable
     function makeOptionEditable(option, voteID) {
-        let currentText = option.contents().filter(function() {
+        let currentText = option.contents().filter(function () {
             return this.nodeType === 3; // Get only the text node
         }).text().trim(); // Get the text content without the percentage
         let originalStyles = option.attr('style');
@@ -402,7 +419,7 @@ $(document).ready(function () {
 
     function fetchDateModified() {
         const deferreds = [];
-        $('.p-last-modified').each(function() {
+        $('.p-last-modified').each(function () {
             const element = $(this);
             const voteId = element.data('vote-id');
             const deferred = $.Deferred();
@@ -410,19 +427,19 @@ $(document).ready(function () {
             $.ajax({
                 url: '/api/vote/getDateModified',
                 method: 'POST',
-                data: { voteId: voteId },
-                success: function(response) {
+                data: {voteId: voteId},
+                success: function (response) {
                     element.attr('data-date-modified', response.dateModified);
                     deferred.resolve();
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     console.error('Error fetching date modified:', error);
                     deferred.reject();
                 }
             });
         });
 
-        $.when.apply($, deferreds).then(function() {
+        $.when.apply($, deferreds).then(function () {
             updateAllTimeAgo();
         });
     }
@@ -441,7 +458,7 @@ $(document).ready(function () {
 
     // Call updateTimeAgo initially
     function updateAllTimeAgo() {
-        $('.p-last-modified').each(function() {
+        $('.p-last-modified').each(function () {
             const element = $(this);
             const dateModifiedAttr = element.attr('data-date-modified');
             if (dateModifiedAttr) {
@@ -463,11 +480,13 @@ $(document).ready(function () {
             });
 
             if (!response.ok) {
+                showAlert(`Error: Failed to fetch vote results:\n${response.status}`)
                 throw new Error(`Failed to fetch vote results: ${response.status}`);
             }
             return await response.json();
         } catch (error) {
-            console.error('Error fetching vote statistics:', error);
+            showAlert(`Error: Failed to fetch vote results:\n${error}`);
+            console.error('Error: Failed to fetch vote results:', error);
             return null;
         }
     }
@@ -548,7 +567,7 @@ $(document).ready(function () {
             let maxPercentage = 0;
             let maxOptionId = null;
 
-            options.each(function() {
+            options.each(function () {
                 const option = $(this);
                 const optionID = option.data('option-id');
                 const optionResult = voteResults.options[optionID];
@@ -575,7 +594,7 @@ $(document).ready(function () {
             });
 
             // Highlight the most voted option
-            options.each(function() {
+            options.each(function () {
                 const option = $(this);
                 if (option.data('option-id') === maxOptionId) {
                     option.addClass('most-voted');
@@ -585,8 +604,8 @@ $(document).ready(function () {
             });
 
         } catch (error) {
+            showAlert(`Error updating vote info:\n${error}`, "danger");
             console.error('Error updating vote display:', error);
-            resetVoteStatistics($card);
         }
 
         // Recalculate Masonry layout
@@ -601,18 +620,51 @@ $(document).ready(function () {
         if (voteCards.length === 0) {
             $emptyMessage.css('visibility', 'visible').hide().fadeIn(duration);
         } else {
-            $emptyMessage.fadeOut(duration, function() {
+            $emptyMessage.fadeOut(duration, function () {
                 $(this).css('visibility', 'hidden');
             });
         }
     }
 
-    async function main(){
+    function showAlert(message, type = 'info', duration = 5000) {
+        const alertId = 'alert-' + Date.now(); // Generate a unique ID for the alert
+        const alertHtml = `
+        <div id="${alertId}" class="alert alert-${type} alert-dismissible fade" role="alert" style="display: none;">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `;
+        const $alert = $(alertHtml);
+        $("#alertContainer").append($alert);
+
+        // Fade in the alert
+        $alert.fadeIn(300, function () {
+            $(this).addClass('show');
+        });
+
+        // Set up auto-dismiss
+        const dismissAlert = () => {
+            $alert.fadeOut(300, function () {
+                $(this).remove();
+            });
+        };
+
+        // Automatically remove the alert after the specified duration
+        const timeoutId = setTimeout(dismissAlert, duration);
+
+        // Clear the timeout if the alert is manually closed
+        $alert.find('.btn-close').on('click', function () {
+            clearTimeout(timeoutId);
+            dismissAlert();
+        });
+    }
+
+    async function main() {
         fetchDateModified();
 
         setInterval(updateAllTimeAgo, 60000);
 
-        $('.card').each(function() {
+        $('.card').each(function () {
             const $card = $(this);
             const voteID = $card.attr('data-vote-id');
             if (voteID && voteID !== 'new-temporarily') {

@@ -4,15 +4,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function initMasonry() {
         if (msnry) {
-            msnry.destroy();
+            msnry.destroy(); // Clean up the old instance
         }
 
         var containerWidth = container.offsetWidth;
-        var cardWidth = 400; // Fixed card width
         var gutter = 20; // Gutter width
-        var columns = Math.floor((containerWidth + gutter) / (cardWidth + gutter));
-        columns = Math.min(Math.max(columns, 1), 4); // Ensure between 1 and 4 columns
+        var cardWidth;
 
+        // Determine card width based on screen size
+        if (window.innerWidth <= 440) {
+            // For screens <= 440px, make card fill the width with some margin
+            cardWidth = containerWidth - (gutter * 2); // Full width minus margins
+        } else {
+            cardWidth = 400; // Default card width for larger screens
+        }
+
+        var columns = Math.max(Math.floor((containerWidth + gutter) / (cardWidth + gutter)), 1); // Ensure at least 1 column
+
+        // Dynamically adjust container width to fit viewport or calculated columns
+        container.style.width = Math.min(columns * (cardWidth + gutter) - gutter, containerWidth) + 'px';
+
+        // Initialize Masonry
         msnry = new Masonry(container, {
             itemSelector: '.card',
             columnWidth: cardWidth,
@@ -20,9 +32,13 @@ document.addEventListener('DOMContentLoaded', function () {
             fitWidth: true
         });
 
-        // Set the container width to fit the columns exactly
-        container.style.width = (columns * (cardWidth + gutter) - gutter) + 'px';
+        // Adjust the width of all cards
+        var cards = container.querySelectorAll('.card');
+        cards.forEach(function(card) {
+            card.style.width = cardWidth + 'px';
+        });
 
+        // Recalculate Masonry layout
         msnry.layout();
     }
 

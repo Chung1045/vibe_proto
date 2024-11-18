@@ -121,3 +121,19 @@
     cursor: pointer;
     margin-left: 10px; /* Add space between the text and the delete icon */
 }
+
+#alertContainer {
+    width: 400px;
+    border-radius: 8px;
+    right: 20px; /* Keep the right offset for larger screens */
+    transition: 0.3s ease-in;
+}
+
+@media(max-width: 500px) {
+    #alertContainer {
+        width: calc(100% - 40px);
+        right: 0; /* Align to the right edge of the viewport */
+        border-radius: 8px;
+        transition: 0.3s ease-in;
+    }
+}

@@ -119,59 +119,96 @@
         .current-page {
             font-size: 36px;
         }
-    </style>
-</head>
-<body>
-<nav class="navbar">
-    <div class="container-fluid">
-        <div class="navbar-brand-container">
-            <a class="navbar-brand" href="/index">Vibe</a>
-            <span class="current-page"><%=currentPage%></span>
-        </div>
 
-        <div class="avatar-dropdown">
-            <button class="avatar-button" id="avatarButton">
-                <div class="avatar-icon">
-                    <i class="bi bi-person"></i>
+        /* New styles for mobile responsiveness */
+        @media (max-width: 440px) {
+            .navbar {
+                padding: 0.5rem 1rem;
+            }
+
+            .container-fluid {
+                width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            .navbar-brand {
+                font-size: 20px;
+            }
+
+            .current-page {
+                font-size: 18px;
+            }
+
+            .navbar-brand-container {
+                flex-grow: 1;
+            }
+        }
+    </style>
+
+    <nav class="navbar">
+        <div class="container-fluid">
+            <div class="navbar-brand-container">
+                <a class="navbar-brand" href="/index">Vibe</a>
+                <span class="current-page"><%=currentPage%></span>
+            </div>
+
+            <div class="avatar-dropdown">
+                <button class="avatar-button" id="avatarButton">
+                    <div class="avatar-icon">
+                        <i class="bi bi-person"></i>
+                    </div>
+                </button>
+                <div class="dropdown-menu" id="avatarDropdown">
+                    <a href="/dashboard" class="dropdown-item">
+                        <i class="bi bi-grid"></i>
+                        Dashboard
+                    </a>
+                    <a href="/settings" class="dropdown-item">
+                        <i class="bi bi-gear"></i>
+                        Settings
+                    </a>
+                    <hr class="dropdown-divider">
+                    <a href="#" class="dropdown-item text-danger" onclick="logout()">
+                        <i class="bi bi-box-arrow-right"></i>
+                        Logout
+                    </a>
                 </div>
-            </button>
-            <div class="dropdown-menu" id="avatarDropdown">
-                <a href="/dashboard" class="dropdown-item">
-                    <i class="bi bi-grid"></i>
-                    Dashboard
-                </a>
-                <a href="/settings" class="dropdown-item">
-                    <i class="bi bi-gear"></i>
-                    Settings
-                </a>
-                <hr class="dropdown-divider">
-                <a href="#" class="dropdown-item text-danger" onclick="logout()">
-                    <i class="bi bi-box-arrow-right"></i>
-                    Logout
-                </a>
             </div>
         </div>
-    </div>
-</nav>
+    </nav>
 
-<style>
+    <style>
+        .navbar-brand-container {
+            display: flex;
+            align-items: center;
+        }
 
-    .navbar-brand-container {
-        display: flex;
-        align-items: center;
-    }
+        .navbar-brand {
+            margin-right: 10px;  /* Add some space between brand and current page */
+        }
 
-    .navbar-brand {
-        margin-right: 10px;  /* Add some space between brand and current page */
-    }
+        .current-page {
+            font-size: 24px;
+            color: #888;
+            font-weight: normal;
+            font-family: "Inter", sans-serif;
+        }
 
-    .current-page {
-        font-size: 24px;
-        color: #888;
-        font-weight: normal;
-        font-family: "Inter", sans-serif;
-    }
-</style>
+        /* Additional responsive styles */
+        @media (max-width: 440px) {
+            .navbar-brand-container {
+                flex-wrap: nowrap;
+                overflow: hidden;
+            }
+
+            .current-page {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+    </style>
 
 <script>
     const avatarButton = document.getElementById('avatarButton');

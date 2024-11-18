@@ -15,6 +15,7 @@
 /* General Styles */
 #section_voteCard_container {
     width: 100%;
+    padding-bottom: 80px; /* padding-bottom to prevent the fab from blocking the content or buttons */
     opacity: 0;
     transition: 0.5s ease;
 }
@@ -27,6 +28,17 @@
     border-radius: 8px;
     box-sizing: border-box;
     margin-bottom: 20px;
+
+    max-width: 100%;
+}
+
+@media (max-width: 440px) {
+    #container .card {
+        width: calc(100vw - 40px) !important; /* Full viewport width minus margins */
+        max-width: calc(100% - 40px);
+        margin-left: auto;
+        margin-right: auto;
+    }
 }
 
 #text_voteTitle_h2 {
