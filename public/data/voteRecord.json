@@ -17,10 +17,6 @@
     ]
   },
   {
-    "voteId": "33e36325-5485-4567-927e-033cc1cd25bf",
-    "voteStatistics": []
-  },
-  {
     "voteId": "03696c24-f9b5-4eb1-8e77-a6facf676953",
     "voteStatistics": [
       {
@@ -49,5 +45,9 @@
         "vote": "1"
       }
     ]
+  },
+  {
+    "voteId": "d0c7d27b-0859-4db1-8d08-68c8bd5fbfc3",
+    "voteStatistics": []
   }
 ]

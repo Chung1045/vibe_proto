@@ -1,12 +1,12 @@
 $(document).ready(function () {
-    // Initialize Masonry
+    let isCreatingNewVote = false;
+
     var $grid = $('#container').masonry({
         itemSelector: '.card',
         columnWidth: '.card',
         gutter: 20,
         fitWidth: true
     });
-
     function setElementVisibility(element, isVisible) {
         if (isVisible) {
             element.style.display = 'block';
@@ -28,21 +28,32 @@ $(document).ready(function () {
     $(document).on('click', '#btn-fab-createVote', function () {
         let containerView = $('#container');
 
+        if (isCreatingNewVote) {
+            alert('Please finish creating the current vote before starting a new one.');
+            return;
+        }
+
+        isCreatingNewVote = true;
+
         const newCardStruct = $(`
-    <div class="card" id="vote_card" data-vote-id="new-temporarily" data-creation-type="new" style="position: absolute; left: 20px; top: 20px;">
-        <p>Title</p><div contenteditable="" class="editable_title" style="margin: 0px 0px 15px; display: block; width: 100%;">Write your Vote Title here</div>
-        <p>Options</p>
-        <div id="vote_option_list" data-vote-id="new-temporarily">
-            <div class="option-wrapper"><div contenteditable="" class="editable_options" data-option-id="1" data-vote-id="new-temporarily" style="display: block;">Option 1</div></div>
-            <div class="option-wrapper"><div contenteditable="" class="editable_options" data-option-id="2" data-vote-id="new-temporarily" style="display: block;">Option 2</div></div>
+        <div class="card" id="vote_card" data-vote-id="new-temporarily" data-creation-type="new" style="position: absolute; left: 20px; top: 20px;">
+            <p>Title</p>
+            <div contenteditable="" class="editable_title" style="margin: 0px 0px 15px; display: block; width: 100%;">Write your Vote Title here</div>
+            <p>Options</p>
+            <div id="vote_option_list" data-vote-id="new-temporarily">
+                <div class="option-wrapper"><div contenteditable="" class="editable_options" data-option-id="1" data-vote-id="new-temporarily" style="display: block;">Option 1</div></div>
+                <div class="option-wrapper"><div contenteditable="" class="editable_options" data-option-id="2" data-vote-id="new-temporarily" style="display: block;">Option 2</div></div>
+            </div>
+            <div class="div-edit-options">
+                <hr class="editable_hr">
+                <div class="editable_addOptions">Add new options</div>
+            </div>
+            <div class="d-flex justify-content-end" id="div_container_action_button">
+            <p class="p-last-modified" data-vote-id="new-temporarily" data-date-modified="${new Date().toISOString()}"><span class="time-ago">now</span></p>
+                <img src="/images/icns/trash-fill.svg" alt="icon" id="btn-delete">
+                <img src="/images/icns/check2.svg" alt="icon" id="btn-save-changes">
+            </div>
         </div>
-        <div class="div-edit-options"><hr class="editable_hr"><div class="editable_addOptions">Add new options</div></div>
-        <div class="d-flex justify-content-end" id="div_container_action_button">
-        <p class="p-last-modified" data-vote-id="new-temporarily" data-date-modified="${new Date().toISOString()}"><span class="time-ago">now</span></p>
-            <img src="/images/icns/trash-fill.svg" alt="icon" id="btn-delete">
-            <img src="/images/icns/check2.svg" alt="icon" id="btn-save-changes">
-        </div>
-    </div>
     `);
 
         // Prepend the new card to the container (at the top)
@@ -50,6 +61,7 @@ $(document).ready(function () {
 
         // Add the new item to Masonry
         $grid.masonry('prepended', newCardStruct);
+        checkVoteEntryNum();
 
         // Recalculate Masonry layout
         $grid.masonry('layout');
@@ -100,6 +112,7 @@ $(document).ready(function () {
                     contentType: 'application/json',
                     success: function(response) {
                         console.log('Vote deleted successfully:', response);
+                        checkVoteEntryNum();
                     },
                     error: function(xhr, status, error) {
                         console.error('Error deleting vote:', error);
@@ -182,62 +195,67 @@ $(document).ready(function () {
     }
 
     function saveVoteData(voteData) {
-        const isNewVote = voteData.voteId === 'new-temporarily';
-        const url = '/api/vote/update';
+        return new Promise((resolve, reject) => {
+            const isNewVote = voteData.voteId === 'new-temporarily';
+            const url = '/api/vote/update';
 
-        $.ajax({
-            url: url,
-            method: 'POST',
-            data: JSON.stringify(voteData),
-            contentType: 'application/json',
-            success: function(response) {
-                if (response.success) {
-                    console.log(isNewVote ? 'Vote created successfully:' : 'Vote updated successfully:', response);
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: JSON.stringify(voteData),
+                contentType: 'application/json',
+                success: function(response) {
+                    if (response.success) {
+                        console.log(isNewVote ? 'Vote created successfully:' : 'Vote updated successfully:', response);
 
-                    const newVoteId = response.voteID || response.vote.voteId;
-                    const card = $(`.card[data-vote-id="${isNewVote ? 'new-temporarily' : voteData.voteId}"]`);
+                        const newVoteId = response.voteID || response.vote.voteId;
+                        const card = $(`.card[data-vote-id="${isNewVote ? 'new-temporarily' : voteData.voteId}"]`);
 
-                    if (isNewVote && newVoteId) {
-                        updateVoteId('new-temporarily', newVoteId);
-                    }
+                        if (isNewVote && newVoteId) {
+                            updateVoteId('new-temporarily', newVoteId);
+                            isCreatingNewVote = false; // Reset the flag after successful creation
+                        }
 
-                    // Update card content
-                    updateCardContent(card, voteData, newVoteId);
+                        // Update card content
+                        updateCardContent(card, voteData, newVoteId);
 
-                    const lastModifiedElement = card.find('.p-last-modified');
-                    if (response.vote && response.vote.dateModified) {
-                        lastModifiedElement.attr('data-date-modified', response.vote.dateModified);
-                        updateAllTimeAgo();
+                        const lastModifiedElement = card.find('.p-last-modified');
+                        if (response.vote && response.vote.dateModified) {
+                            lastModifiedElement.attr('data-date-modified', response.vote.dateModified);
+                            updateAllTimeAgo();
+                        } else {
+                            // If dateModified is not in the response, fetch it
+                            $.ajax({
+                                url: '/api/vote/getDateModified',
+                                method: 'GET',
+                                data: { voteId: newVoteId },
+                                success: function(dateResponse) {
+                                    lastModifiedElement.attr('data-date-modified', dateResponse.dateModified);
+                                    updateAllTimeAgo();
+                                },
+                                error: function(xhr, status, error) {
+                                    console.error('Error fetching updated date modified:', error);
+                                }
+                            });
+                        }
+
+                        // Recalculate Masonry layout
+                        $grid.masonry('layout');
+
+                        resolve(); // Resolve the promise on success
                     } else {
-                        // If dateModified is not in the response, fetch it
-                        $.ajax({
-                            url: '/api/vote/getDateModified',
-                            method: 'GET',
-                            data: { voteId: newVoteId },
-                            success: function(dateResponse) {
-                                lastModifiedElement.attr('data-date-modified', dateResponse.dateModified);
-                                updateAllTimeAgo();
-                            },
-                            error: function(xhr, status, error) {
-                                console.error('Error fetching updated date modified:', error);
-                            }
-                        });
+                        console.error(isNewVote ? 'Error creating vote:' : 'Error updating vote:', response.message);
+                        reject(new Error(response.message)); // Reject the promise on error
                     }
-
-                    // Recalculate Masonry layout
-                    $grid.masonry('layout');
-
-                } else {
-                    console.error(isNewVote ? 'Error creating vote:' : 'Error updating vote:', response.message);
-                    // Handle the error, maybe show an error message to the user
+                },
+                error: function(xhr, status, error) {
+                    console.error(isNewVote ? 'Error creating vote:' : 'Error updating vote:', error);
+                    reject(error); // Reject the promise on AJAX error
                 }
-            },
-            error: function(xhr, status, error) {
-                console.error(isNewVote ? 'Error creating vote:' : 'Error updating vote:', error);
-                // You can add error handling here, like showing an error message to the user
-            }
+            });
         });
     }
+
 
     function updateVoteId(oldVoteId, newVoteId) {
         const card = $(`.card[data-vote-id="${oldVoteId}"]`);
@@ -575,18 +593,37 @@ $(document).ready(function () {
         $grid.masonry('layout');
     }
 
-// Call updateAllTimeAgo initially
-    fetchDateModified();
+    function checkVoteEntryNum() {
+        const voteCards = document.querySelectorAll('.card');
+        const $emptyMessage = $('#empty_message_div');
+        const duration = 400; // Duration of the fade effect in milliseconds
 
-// Update time ago every minute
-    setInterval(updateAllTimeAgo, 60000);
-
-    $('.card').each(function() {
-        const $card = $(this);
-        const voteID = $card.attr('data-vote-id');
-        if (voteID && voteID !== 'new-temporarily') {
-            updateVoteDisplay($card);
+        if (voteCards.length === 0) {
+            $emptyMessage.css('visibility', 'visible').hide().fadeIn(duration);
+        } else {
+            $emptyMessage.fadeOut(duration, function() {
+                $(this).css('visibility', 'hidden');
+            });
         }
-    });
+    }
+
+    async function main(){
+        fetchDateModified();
+
+        setInterval(updateAllTimeAgo, 60000);
+
+        $('.card').each(function() {
+            const $card = $(this);
+            const voteID = $card.attr('data-vote-id');
+            if (voteID && voteID !== 'new-temporarily') {
+                updateVoteDisplay($card);
+            }
+        });
+
+        checkVoteEntryNum();
+    }
+
+    main();
+
 
 });

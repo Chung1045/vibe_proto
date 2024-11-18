@@ -44,8 +44,12 @@ app.get("/", (req, res) => {
 
 app.get("/dashboard", requireAuth, async (req, res) => {
     try {
-        const voteData = await databaseHelper.getVoteData();
-        res.render("dashboard", {voteData: voteData});
+        const allVoteData = await databaseHelper.getVoteData();
+
+        // Filter the vote data to only include votes authored by the current user
+        const userVoteData = allVoteData.filter(vote => vote.authorUid === req.session.uid);
+
+        res.render("dashboard", {voteData: userVoteData});
     } catch (error) {
         console.error("Error fetching vote data:", error);
         res.status(500).send("Error fetching vote data");
@@ -343,7 +347,6 @@ app.get("*", async (req, res) => {
                 }
             }
         }
-
         res.render("index", {voteData: voteData, userVotes: userVotes, isAuthenticated: req.session.authenticated});
     } catch (error) {
         console.error("Error fetching vote data:", error);
