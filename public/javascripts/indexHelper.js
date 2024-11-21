@@ -67,17 +67,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 body: JSON.stringify({voteID: voteID, voteOptionID: optionID}),
             });
 
-            if (!response.ok) {
-                throw new Error(`Server error: ${response.status}`);
-            }
-
             const data = await response.json();
-            console.log('Vote submission successful:', data);
-            alert('Vote submitted successfully!');
+            showAlert("Vote recorded successfully", "success");
             return data;
         } catch (error) {
-            console.error('Error submitting vote:', error);
-            alert('There was an error submitting your vote. Please try again.');
+            showAlert("There was an error submitting your vote.", "danger");
             throw error;
         }
     }
@@ -108,7 +102,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 throw new Error('Invalid vote results structure');
             }
 
-            // Extract the actual option ID from the structure
             const userVotedOption = userVotedOptionData && userVotedOptionData.voteOption && userVotedOptionData.voteOption.optionId;
 
             console.log('Vote results:', voteResults);
@@ -117,7 +110,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const hasVotes = Object.values(voteResults.options).some(option => option.percentage > 0);
 
-            // Add voted class to card if there are votes
             if (hasVotes) {
                 card.classList.add('voted');
             } else {
@@ -128,7 +120,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 const optionId = option.dataset.optionId;
                 const optionResult = voteResults.options[optionId];
 
-                // Create or get percentage span
                 let percentageSpan = option.querySelector('.vote-percentage');
                 if (!percentageSpan) {
                     percentageSpan = document.createElement('span');
@@ -136,17 +127,24 @@ document.addEventListener('DOMContentLoaded', function () {
                     option.appendChild(percentageSpan);
                 }
 
+                // Check icon element
+                let checkIcon = option.querySelector('.check-icon');
+                if (!checkIcon) {
+                    checkIcon = document.createElement('i');
+                    checkIcon.classList.add('bi', 'bi-check-circle-fill', 'check-icon');
+                    checkIcon.style.marginLeft = '10px';
+                    checkIcon.style.display = 'none';
+                    option.appendChild(checkIcon);
+                }
+
                 if (hasVotes) {
-                    // Remove click handler and add voted class
                     option.removeEventListener('click', handleVoteClick);
                     option.classList.add('voted');
 
-                    // Update percentage display
                     const percentage = optionResult.percentage.toFixed(1);
                     percentageSpan.textContent = `${percentage}%`;
                     option.style.setProperty('--option-percentage', `${percentage}%`);
 
-                    // Apply selected/unselected styles
                     console.log("Comparing option id:", optionId, "with user voted option:", userVotedOption);
                     if (optionId === userVotedOption) {
                         console.log("Match found! Applying user-selected class to option:", optionId);
@@ -156,16 +154,18 @@ document.addEventListener('DOMContentLoaded', function () {
                         console.log("No match. Applying other-option class to option:", optionId);
                         option.classList.remove('user-selected');
                         option.classList.add('other-option');
+                        checkIcon.style.display = 'none'; // Hide check icon
                     }
                 } else {
-                    // Reset option to unvoted state
                     option.classList.remove('voted', 'user-selected', 'other-option');
                     option.addEventListener('click', handleVoteClick);
                     percentageSpan.textContent = '';
                     option.style.setProperty('--option-percentage', '0%');
+                    checkIcon.style.display = 'none'; // Hide check icon
                 }
             });
         } catch (error) {
+            showAlert("There was an error updating vote info.", "danger");
             console.error('Error updating vote display:', error);
         }
     }
@@ -210,6 +210,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const data = await response.json();
             return data.hasVoted;
         } catch (error) {
+            showAlert("Unable to fetch vote record", "danger");
             console.error('Error checking if voted:', error);
             return false; // Assume not voted in case of error
         }
@@ -259,8 +260,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
                 }
             } catch (error) {
+                showAlert("There was an error processing vote data.", "danger");
                 console.error('Error processing vote card:', error);
-                // Handle the error appropriately, maybe display an error message on the card
             }
         }
     }
@@ -287,6 +288,7 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log('Raw user voted option data:', data);
             return data; // This should be an object with a voteOption property
         } catch (error) {
+            showAlert("Unable to fetch voted record.", "danger");
             console.error('Error getting user voted option:', error);
             return null;
         }
@@ -313,6 +315,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             return voteAuthor; // Return the author's username
         } catch (error) {
+            showAlert("Unable to fetch vote info.", "danger");
             console.error('Error fetching vote author:', error);
             throw error; // Re-throw the error if you want calling code to handle it
         }
@@ -373,6 +376,39 @@ document.addEventListener('DOMContentLoaded', function () {
         if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)}d`;
         if (diffInSeconds < 31536000) return `${Math.floor(diffInSeconds / 2592000)}mo`;
         return `${Math.floor(diffInSeconds / 31536000)}yr`;
+    }
+
+    function showAlert(message, type = 'info', duration = 5000) {
+        const alertId = 'alert-' + Date.now(); // Generate a unique ID for the alert
+        const alertHtml = `
+        <div id="${alertId}" class="alert alert-${type} alert-dismissible fade" role="alert" style="display: none;">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        `;
+        const $alert = $(alertHtml);
+        $("#alertContainer").append($alert);
+
+        // Fade in the alert
+        $alert.fadeIn(300, function () {
+            $(this).addClass('show');
+        });
+
+        // Set up auto-dismiss
+        const dismissAlert = () => {
+            $alert.fadeOut(300, function () {
+                $(this).remove();
+            });
+        };
+
+        // Automatically remove the alert after the specified duration
+        const timeoutId = setTimeout(dismissAlert, duration);
+
+        // Clear the timeout if the alert is manually closed
+        $alert.find('.btn-close').on('click', function () {
+            clearTimeout(timeoutId);
+            dismissAlert();
+        });
     }
 
     // Initialize everything

@@ -96,7 +96,7 @@
 }
 
 .text_voteOptions_p.user-selected::before {
-    background-color: rgba(117, 109, 214, 1);
+    background-color: rgb(161, 155, 227);
 }
 
 .text_voteOptions_p.other-option {
@@ -141,11 +141,11 @@
 }
 
 p.user-selected {
-    color: #d3d3d3;
+    color: #676767;;
 }
 
 p.user-selected span {
-    color: #bab9b9;
+    color: #676767;
 }
 
 p.other-option {

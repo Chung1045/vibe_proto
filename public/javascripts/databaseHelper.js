@@ -348,28 +348,39 @@ async function saveToUserDatabase() {
 async function changeUserName(uid, newUsername) {
     return new Promise(async (resolve, reject) => {
         console.log(`Changing username to ${newUsername}...`);
-        // Check if the new username is already taken
-        const existingUser = await searchUser(newUsername);
-        if (existingUser) {
-            console.error(`Username ${newUsername} is already occupied`);
-            reject(new Error(`Username ${newUsername} is already occupied`));
+
+        if (!newUsername) {
+            console.error("New username is undefined or empty");
+            return reject(new Error("New username is required"));
         }
 
-        // Find the user by UID
-        const userIndex = userData.findIndex(user => user.uid === uid);
-        if (userIndex === -1) {
-            console.error(`User with UID ${uid} not found`);
-            reject(new Error(`User with UID ${uid} not found`));
+        try {
+            // Check if the new username is already taken
+            const existingUser = await searchUser(newUsername);
+            if (existingUser && existingUser.uid !== uid) {
+                console.error(`Username ${newUsername} is already occupied`);
+                return reject(new Error(`Username ${newUsername} is already occupied`));
+            }
+
+            // Find the user by UID
+            const userIndex = userData.findIndex(user => user.uid === uid);
+            if (userIndex === -1) {
+                console.error(`User with UID ${uid} not found`);
+                return reject(new Error(`User with UID ${uid} not found`));
+            }
+
+            // Update the username
+            const oldUsername = userData[userIndex].username;
+            userData[userIndex].username = newUsername;
+
+            // Save the updated user data
+            await saveToUserDatabase();
+            console.log(`Username changed successfully from ${oldUsername} to ${newUsername}`);
+            resolve({success: true, username: newUsername});
+        } catch (error) {
+            console.error("Error in changeUserName:", error);
+            reject(error);
         }
-
-        // Update the username
-        const oldUsername = userData[userIndex].username;
-        userData[userIndex].username = newUsername;
-
-        // Save the updated user data
-        await saveToUserDatabase();
-        console.log(`Username changed successfully from ${oldUsername} to ${newUsername}`);
-        resolve({success: true, username: newUsername});
     });
 }
 
@@ -401,7 +412,7 @@ async function changeUserPhoneNumber(uid, newPhoneNumber) {
 
 async function changeUserPassword(uid, oldPassword, newPassword) {
     return new Promise(async (resolve, reject) => {
-        console.log(`Changing password for uid ${uid}}`);
+        console.log(`Changing password for uid ${uid}`);
 
         const userIndex = userData.findIndex(user => user.uid === uid);
         if (userIndex === -1) {
@@ -417,7 +428,6 @@ async function changeUserPassword(uid, oldPassword, newPassword) {
 
         try {
             await saveToUserDatabase();
-            console.log(`Password changed successfully`);
             resolve({success: true, password: newPassword});
         } catch (err) {
             reject(new Error("Error saving updated user password\n" + err));
@@ -533,6 +543,19 @@ async function checkCredentials(username, password) {
     }
 }
 
+async function fetchUserInfo(uid) {
+    return new Promise(async (resolve, reject) => {
+        console.log("Fetching user info...");
+        const user = userData.find(user => user.uid === uid);
+        if (!user) {
+            reject(new Error(`User with UID ${uid} not found`));
+        } else {
+            resolve({success: true, userName: user.username, phoneNumber: user.phoneNum, email: user.email});
+        }
+
+    });
+}
+
 // Replace the module.exports at the end of the file with this:
 
 export {
@@ -559,5 +582,6 @@ export {
     getVoteData,
     getVoteById,
     getVotedOption,
-    getVoteAuthor
+    getVoteAuthor,
+    fetchUserInfo
 };

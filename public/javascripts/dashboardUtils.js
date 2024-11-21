@@ -122,6 +122,8 @@ $(document).ready(function () {
                 let voteEntry = document.querySelector(`.card[data-vote-id="${voteID}"]`);
                 $(voteEntry).remove();
                 $grid.masonry('layout');
+                showAlert("Vote entry removed", "success");
+                checkVoteEntryNum();
             }
         }
     });

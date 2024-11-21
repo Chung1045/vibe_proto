@@ -107,4 +107,51 @@ $(document).ready(function(){
             icon.removeClass('fa-eye-slash').addClass('fa-eye');
         }
     });
+
+    async function fetchBackDrop() {
+        try {
+            const response = await $.ajax({
+                url: '/api/getBackDrop',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({}),
+            });
+
+            if (response.success) {
+                return response.backgroundURL;
+            } else {
+                throw new Error("Failed to fetch backdrop");
+            }
+        } catch (error) {
+            console.error("Error fetching backdrop, likely that you don't have an Unsplash API key\n", error);
+            return null;
+        }
+    }
+
+    function loadImage(url) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.src = url;
+            img.onload = () => resolve(img);
+            img.onerror = reject;
+        });
+    }
+
+    async function main() {
+        try {
+            const imageUrl = await fetchBackDrop();
+            if (imageUrl) {
+                await loadImage(imageUrl);
+                document.body.style.backgroundImage = `url(${imageUrl})`;
+            }
+        } catch (error) {
+            console.error('Error loading the image:', error);
+        } finally {
+            // Fade in the body regardless of whether the image loaded successfully
+            $("body").fadeIn(500);
+        }
+    }
+
+    main();
+
 });

@@ -64,150 +64,18 @@
     ]
   },
   {
-    "voteId": "778f7893-bb0d-4c77-a9b5-f66391e99d12",
+    "voteId": "fec618e2-7eac-4f05-9843-631bcdf7cd3b",
     "authorUid": "1234567890",
-    "dateModified": "2024-11-18T12:47:03.359Z",
-    "voteTitle": "Write your Vote Title here",
+    "dateModified": "2024-11-18T13:11:48.360Z",
+    "voteTitle": "This is a sample voteWhat do you want for the party?",
     "voteOptions": [
       {
         "id": "1",
-        "name": "Option 1"
+        "name": "PlayStation"
       },
       {
         "id": "2",
-        "name": "Option 2"
-      }
-    ]
-  },
-  {
-    "voteId": "561e299c-4975-45f1-85a2-f0e02a1c512b",
-    "authorUid": "1234567890",
-    "dateModified": "2024-11-18T12:10:32.455Z",
-    "voteTitle": "Write your Vote Title here",
-    "voteOptions": [
-      {
-        "id": "1",
-        "name": "Option 1"
-      },
-      {
-        "id": "2",
-        "name": "Option 2"
-      },
-      {
-        "id": "3",
-        "name": "New option"
-      }
-    ]
-  },
-  {
-    "voteId": "e0a99d07-ab59-4e77-8ac1-b07b5ba64dad",
-    "authorUid": "1234567890",
-    "dateModified": "2024-11-18T12:10:35.144Z",
-    "voteTitle": "Write your Vote Title here",
-    "voteOptions": [
-      {
-        "id": "1",
-        "name": "Option 1"
-      },
-      {
-        "id": "2",
-        "name": "Option 2"
-      }
-    ]
-  },
-  {
-    "voteId": "db8bdcda-9f64-493a-b317-ebc044e29ac3",
-    "authorUid": "1234567890",
-    "dateModified": "2024-11-18T12:02:59.316Z",
-    "voteTitle": "Write your Vote Title here",
-    "voteOptions": [
-      {
-        "id": "1",
-        "name": "Option 1"
-      },
-      {
-        "id": "2",
-        "name": "Option 2"
-      }
-    ]
-  },
-  {
-    "voteId": "11db5219-2950-4a1a-9a53-7bbc7b3f12b5",
-    "authorUid": "1234567890",
-    "dateModified": "2024-11-18T12:03:03.285Z",
-    "voteTitle": "Write your Vote Title here",
-    "voteOptions": [
-      {
-        "id": "1",
-        "name": "Option 1"
-      },
-      {
-        "id": "2",
-        "name": "Option 2"
-      }
-    ]
-  },
-  {
-    "voteId": "7e8c00c2-0020-4ad7-845d-5cbeb6d05d26",
-    "authorUid": "1234567890",
-    "dateModified": "2024-11-18T12:03:07.695Z",
-    "voteTitle": "Write your Vote Title here",
-    "voteOptions": [
-      {
-        "id": "1",
-        "name": "Option 1"
-      },
-      {
-        "id": "2",
-        "name": "Option 2"
-      }
-    ]
-  },
-  {
-    "voteId": "5aa8bfab-c293-4ed7-a3a1-425a49467933",
-    "authorUid": "1234567890",
-    "dateModified": "2024-11-18T12:03:17.998Z",
-    "voteTitle": "Write your Vote Title here",
-    "voteOptions": [
-      {
-        "id": "1",
-        "name": "Option 1"
-      },
-      {
-        "id": "2",
-        "name": "Option 2"
-      }
-    ]
-  },
-  {
-    "voteId": "434536bb-5e7a-4104-90d4-e19ba297c011",
-    "authorUid": "1234567890",
-    "dateModified": "2024-11-18T12:06:28.457Z",
-    "voteTitle": "Write your Vote Title here",
-    "voteOptions": [
-      {
-        "id": "1",
-        "name": "Option 1"
-      },
-      {
-        "id": "2",
-        "name": "Option 2"
-      }
-    ]
-  },
-  {
-    "voteId": "76b19ddd-badf-49bd-a7f8-5995fa864747",
-    "authorUid": "1234567890",
-    "dateModified": "2024-11-18T12:07:03.224Z",
-    "voteTitle": "Write your Vote Title here",
-    "voteOptions": [
-      {
-        "id": "1",
-        "name": "Option 1"
-      },
-      {
-        "id": "2",
-        "name": "Option 2"
+        "name": "Switch"
       }
     ]
   }

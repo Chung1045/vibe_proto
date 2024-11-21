@@ -5,7 +5,15 @@ body {
 .card {
     border: none;
     border-radius: 8px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    align-self: center;
+    margin: 20px auto auto auto;
+    align-items: flex-start;
+    max-width: 500px;
+    width: 90%;
+}
+.card_body_container{
+    width: calc(100% - 40px);
+    margin: 20px;
 }
 
 img {
@@ -49,4 +57,56 @@ a:hover {
     .d-flex a {
         display: inline-block;
     }
+}
+
+.field-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #ddd; /* Add the underline */
+    padding: 10px 0;
+}
+
+.field-name-text {
+    font-size: 16px;
+    color: #6c757d; /* Gray color */
+}
+
+.field-value-text {
+    font-size: 20px;
+    font-weight: 500;
+    color: #333; /* Darker text for the phone number */
+}
+
+.edit-icon {
+    font-size: 18px;
+    color: #6c757d; /* Gray color */
+    cursor: pointer;
+}
+
+.container-fluid{
+    flex: 1
+}
+
+.modal-actionButton-container-div {
+    display: flex;
+    justify-content: flex-end; /* Align buttons to the right */
+    padding: 0;
+    margin: 0 16px 16px 16px; /* Add some space above the buttons */
+}
+
+.modal-actionButton-container-div button{
+    margin-left: 10px;
+}
+
+.invalid-feedback{
+    margin-bottom: 8px;
+}
+
+#alertContainer{
+    margin: 16px 16px 0 16px;
+}
+
+#deactivate-account-a{
+    color: #C66868;
 }

@@ -13,6 +13,10 @@
       {
         "uid": "ca944b4e-fbcf-4ca8-b6ec-9085bdefa6c1",
         "vote": "2"
+      },
+      {
+        "uid": "1234567890",
+        "vote": "1"
       }
     ]
   },
@@ -30,12 +34,21 @@
       {
         "uid": "ca944b4e-fbcf-4ca8-b6ec-9085bdefa6c1",
         "vote": "2"
+      },
+      {
+        "uid": "1234567890",
+        "vote": "2"
       }
     ]
   },
   {
     "voteId": "4a79c2c9-dbe6-4969-989b-1d2ad12ef37b",
-    "voteStatistics": []
+    "voteStatistics": [
+      {
+        "uid": "1234567890",
+        "vote": "1"
+      }
+    ]
   },
   {
     "voteId": "ebcc356b-3ba1-4752-86bd-e942d6836a99",
@@ -47,39 +60,12 @@
     ]
   },
   {
-    "voteId": "778f7893-bb0d-4c77-a9b5-f66391e99d12",
-    "voteStatistics": []
-  },
-  {
-    "voteId": "561e299c-4975-45f1-85a2-f0e02a1c512b",
-    "voteStatistics": []
-  },
-  {
-    "voteId": "e0a99d07-ab59-4e77-8ac1-b07b5ba64dad",
-    "voteStatistics": []
-  },
-  {
-    "voteId": "db8bdcda-9f64-493a-b317-ebc044e29ac3",
-    "voteStatistics": []
-  },
-  {
-    "voteId": "11db5219-2950-4a1a-9a53-7bbc7b3f12b5",
-    "voteStatistics": []
-  },
-  {
-    "voteId": "7e8c00c2-0020-4ad7-845d-5cbeb6d05d26",
-    "voteStatistics": []
-  },
-  {
-    "voteId": "5aa8bfab-c293-4ed7-a3a1-425a49467933",
-    "voteStatistics": []
-  },
-  {
-    "voteId": "434536bb-5e7a-4104-90d4-e19ba297c011",
-    "voteStatistics": []
-  },
-  {
-    "voteId": "76b19ddd-badf-49bd-a7f8-5995fa864747",
-    "voteStatistics": []
+    "voteId": "fec618e2-7eac-4f05-9843-631bcdf7cd3b",
+    "voteStatistics": [
+      {
+        "uid": "1234567890",
+        "vote": "1"
+      }
+    ]
   }
 ]
