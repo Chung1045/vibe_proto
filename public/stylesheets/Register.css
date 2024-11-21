@@ -1,4 +1,4 @@
-body {
+body{
     margin: 0;
     padding: 0;
     font-family: 'Inter', sans-serif;
@@ -11,16 +11,6 @@ body {
     justify-content: center;
     align-items: center;
 }
-
-.register-container {
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-    max-width: 400px;
-    width: 90%;
-}
-
 .title {
     font-family: 'Young Serif', serif;
     text-align: left;
@@ -31,27 +21,42 @@ body {
 
 .subtitle {
     text-align: left;
-    margin-bottom: 30px;
+    margin-bottom: 15px;
     font-size: 24px;
     color: #666;
 }
 
+.register-container {
+    background-color: #fbfbfb;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    width: 100%; /* Changed from 90% to 100% */
+    box-sizing: border-box; /* Add this to include padding in the width calculation */
+    transition: 0.3s;
+}
+
+
 .register-form .form-group {
-    margin-bottom: 20px;
-    position: relative; /* Needed for label positioning */
+    margin-bottom: 20px; /* Changed from 15px to 20px to match Login.css */
+    position: relative;
 }
 
 .register-form input {
-    width: 95%;
+    width: 100%; /* Changed from 95% to 100% */
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid #ababab;
     border-radius: 5px;
     font-size: 16px;
     font-family: 'Inter', sans-serif;
+    transition: border-color 0.3s ease;
+    color: #6b72e1;
+    background: transparent;
+    box-sizing: border-box; /* Add this to include padding in the width calculation */
 }
 
 .register-form input {
-    width: 95%; /* Adjusted width */
     padding: 10px;
     border: 1px solid #ababab;
     border-radius: 5px;
@@ -103,16 +108,23 @@ body {
     font-size: 14px;
 }
 
-.register-form .register_button {
+.register_button {
     width: 100%;
     padding: 10px;
     background-color: #6b72e1;
-    color: #fff;
+    color: #fbfbfb;
     border: none;
     border-radius: 5px;
     font-size: 16px;
     cursor: pointer;
     font-family: 'Inter', sans-serif;
+    transition: 0.5s; /* Add transition for hover effect */
+}
+
+.register-form .register_button:hover {
+    opacity: 1;
+    background-color: #3543ff;
+    color: #fbfbfb;
 }
 
 .register-form .sign-up {
@@ -121,11 +133,32 @@ body {
     font-size: 14px;
 }
 
+/* Position the eye icon */
 .eye-icon {
     position: absolute;
-    right: 10px; /* Adjust the position */
+    right: 10px;
     top: 50%;
     transform: translateY(-50%);
-    cursor: pointer; /* Pointer on hover */
-    color: #000000; /* Eye icon color */
+    cursor: pointer;
+    color: #2d2d2d;
+}
+
+a{
+    color: #6b72e1;
+}
+.back-button{
+    color: #2d2d2d;
+}
+
+@media(max-width: 550px) {
+    .register-container {
+        background-color: #ffffff;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: none;
+        max-width: 400px;
+        width: 90%;
+        box-sizing: border-box;
+        transition: 0.3s;
+    }
 }

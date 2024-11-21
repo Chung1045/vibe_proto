@@ -1,4 +1,4 @@
-/* For declaring font from Google Fonts */
+/* Font Declarations */
 .young-serif-regular {
     font-family: "Young Serif", serif;
     font-weight: 400;
@@ -12,21 +12,64 @@
     font-style: normal;
 }
 
+/* General Styles */
+#section_voteCard_container {
+    width: 100%;
+    padding-bottom: 80px; /* padding-bottom to prevent the fab from blocking the content or buttons */
+    opacity: 0;
+    transition: 0.5s ease;
+}
+
+/* Vote Card Styles */
+.card {
+    width: 400px;
+    padding: 20px;
+    background-color: #F5F5F5;
+    border-radius: 8px;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+
+    max-width: 100%;
+}
+
+@media (max-width: 440px) {
+    #container .card {
+        width: calc(100vw - 40px) !important; /* Full viewport width minus margins */
+        max-width: calc(100% - 40px);
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
 #text_voteTitle_h2 {
     color: #2d2d2d;
     font-size: 20px;
     font-family: "Young Serif", serif;
-    padding-bottom: 15px;
+    margin-bottom: 15px;
 }
 
+#text_voteAuthorAndTime {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #888;
+}
+
+/* Vote Option Styles */
 .text_voteOptions_p {
+    background-color: #EDEDED;
     color: #666666;
     font-size: 16px;
     font-family: "Inter", sans-serif;
     outline: 1px solid #666666;
     border-radius: 8px;
-    padding: 15px;
+    padding: 10px 15px;
     transition: 0.25s;
+    margin-bottom: 15px;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .text_voteOptions_p:hover {
@@ -34,45 +77,112 @@
     outline: 3px solid #756DD6;
 }
 
+.text_voteOptions_p.voted {
+    cursor: default;
+    background-color: rgba(187, 187, 187, 0.2);
+}
+
+.text_voteOptions_p::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: var(--option-percentage, 0%);
+    background-color: rgb(148, 148, 148);
+    transition: width 0.3s ease;
+    z-index: -1;
+    border-radius: 8px;
+}
+
+.text_voteOptions_p.user-selected::before {
+    background-color: rgb(161, 155, 227);
+}
+
+.text_voteOptions_p.other-option {
+    background-color: #f0f0f0;
+}
+
+.text_voteOptions_p.most-voted{
+    color: #676767;
+}
+
+.text_voteOptions_p > * {
+    position: relative;
+    z-index: 1;
+}
+
+.option-text {
+    flex-grow: 1;
+    margin-right: 10px;
+}
+
+.vote-percentage {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: bold;
+    z-index: 2;
+}
+
+.most-voted::before {
+    background-color: rgb(161, 155, 227);
+}
+
 .text_voteOptions_p.clicked_selected {
-    background-color: #756DD6;
-    color: #f5f5f5;
+    background-color: rgba(117, 109, 214, 0.8);
+    color: #ffffff;
 }
 
 .text_voteOptions_p.clicked_not_selected {
-    background-color: #919191;
+    background-color: rgb(148, 148, 148);
     color: #2d2d2d;
 }
 
-#section_voteCard_container {
-    width: 100%;
-    opacity: 0;
-    transition: 0.5s ease;
-}
-.card {
-    width: 400px;
-    padding: 20px;
-    background-color: #fbfbfb;
-    border-radius: 8px;
-    box-sizing: border-box;
-    margin-bottom: 20px;
+p.user-selected {
+    color: #676767;;
 }
 
+p.user-selected span {
+    color: #676767;
+}
+
+p.other-option {
+    color: #6c6c6c;
+}
+
+p.other-option span {
+    color: #bab9b9;
+}
+
+/* Layout and Container Styles */
 #container {
     width: 100%;
     margin: 0 auto;
-    padding: 20px 20px 0 20px; /* Add some padding on the sides */
+    padding: 20px 20px 0 20px;
 }
 
-/* Add some bottom margin to the vote title for consistency */
-#text_voteTitle_h2 {
-    margin-bottom: 15px;
+.vote_info_container {
+    display: flex;
 }
 
-/* Style for the author and time text */
-#text_voteAuthorAndTime {
-    margin-top: 15px;
-    font-size: 14px;
-    color: #888;
+.vote_info_container p{
+    margin-right: 5px;
+    margin-bottom: 0;
 }
 
+#empty_message_div {
+    color: #666666;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    visibility: hidden;
+    display: none; /* Ensures it's initially hidden and takes no space */
+}
+
+body{
+    background-color: #fbfbfb;
+}

@@ -1,297 +1,9 @@
 [
   {
-    "voteId": "1234567890",
-    "authorUid": "1234567890",
-    "dateModified": "2024-11-14T12:24:09.425Z",
-    "voteTitle": "Updated Vote Title",
-    "voteOptions": [
-      {
-        "id": "1",
-        "name": "New Option 1"
-      },
-      {
-        "id": "2",
-        "name": "New Option 2"
-      }
-    ]
-  },
-  {
-    "voteId": "234567890",
-    "authorUid": "1234567890",
-    "dateModified": "2019-01-01T00:00:00.000Z",
-    "voteTitle": "Chocolate or white chocolate?",
-    "voteOptions": [
-      {
-        "id": "1",
-        "name": "Chocolate"
-      },
-      {
-        "id": "2",
-        "name": "White Chocolate"
-      }
-    ]
-  },
-  {
-    "voteId": "334567890",
-    "authorUid": "1234567890",
-    "dateModified": "2019-01-01T00:00:00.000Z",
-    "voteTitle": "Help decide which laptop to purchase",
-    "voteOptions": [
-      {
-        "id": "1",
-        "name": "Surface Laptop 7"
-      },
-      {
-        "id": "2",
-        "name": "MacBook Air M3 13\""
-      },
-      {
-        "id": "3",
-        "name": "Galaxy Book 4 Pro"
-      },
-      {
-        "id": "4",
-        "name": "Asus ZenBook S 14"
-      },
-      {
-        "id": "5",
-        "name": "Lenovo IdeaPad Slim 7x"
-      }
-    ]
-  },
-  {
-    "voteId": "434567890",
-    "authorUid": "1234567890",
-    "dateModified": "2019-01-01T00:00:00.000Z",
-    "voteTitle": "Try to make them all 25%!",
-    "voteOptions": [
-      {
-        "id": "1",
-        "name": "A"
-      },
-      {
-        "id": "2",
-        "name": "B"
-      },
-      {
-        "id": "3",
-        "name": "C"
-      },
-      {
-        "id": "4",
-        "name": "D"
-      }
-    ]
-  },
-  {
-    "voteId": "534567890",
-    "authorUid": "1234567890",
-    "dateModified": "2019-01-01T00:00:00.000Z",
-    "voteTitle": "What character to cosplay?",
-    "voteOptions": [
-      {
-        "id": "1",
-        "name": "Blah Blah Blah"
-      },
-      {
-        "id": "2",
-        "name": "Blah Blah Blah"
-      },
-      {
-        "id": "3",
-        "name": "Blah Blah Blah"
-      }
-    ]
-  },
-  {
-    "voteId": "634567890",
-    "authorUid": "1234567890",
-    "dateModified": "2019-01-01T00:00:00.000Z",
-    "voteTitle": "Who is the most handsome guy?",
-    "voteOptions": [
-      {
-        "id": "1",
-        "name": "Chung"
-      },
-      {
-        "id": "2",
-        "name": "Thomas"
-      },
-      {
-        "id": "3",
-        "name": "Ezeamuzie"
-      }
-    ]
-  },
-  {
-    "voteId": "734567890",
-    "authorUid": "1234567890",
-    "dateModified": "2019-01-01T00:00:00.000Z",
-    "voteTitle": "Which rhythm game music composer makes you fear??",
-    "voteOptions": [
-      {
-        "id": "1",
-        "name": "Camelia"
-      },
-      {
-        "id": "2",
-        "name": "Laur"
-      },
-      {
-        "id": "3",
-        "name": "Sakuzyo"
-      },
-      {
-        "id": "4",
-        "name": "Slientroom"
-      }
-    ]
-  },
-  {
-    "voteId": "834567890",
-    "authorUid": "1234567890",
-    "dateModified": "2019-01-01T00:00:00.000Z",
-    "voteTitle": "Which browser you prefer?",
-    "voteOptions": [
-      {
-        "id": "1",
-        "name": "Chrome"
-      },
-      {
-        "id": "2",
-        "name": "Edge"
-      },
-      {
-        "id": "3",
-        "name": "Firefox"
-      },
-      {
-        "id": "4",
-        "name": "Opera"
-      },
-      {
-        "id": "5",
-        "name": "Safari"
-      },
-      {
-        "id": "6",
-        "name": "Brave"
-      },
-      {
-        "id": "7",
-        "name": "Vivaldi"
-      },
-      {
-        "id": "8",
-        "name": "Yandex"
-      },
-      {
-        "id": "9",
-        "name": "Arc Browser"
-      }
-    ]
-  },
-  {
-    "voteId": "26685f38-2855-45f1-9c9c-dbdce39a0ad9",
-    "authorUid": "Hi",
-    "dateModified": "2024-11-14T15:18:03.939Z",
-    "voteTitle": "Updated Vote Title",
-    "voteOptions": [
-      {
-        "id": "1",
-        "name": "New Option 1"
-      },
-      {
-        "id": "2",
-        "name": "New Option 2"
-      }
-    ]
-  },
-  {
-    "voteId": "003f5dbd-fa94-4c06-bf1e-2725bcbbed2b",
-    "authorUid": "Hi",
-    "dateModified": "2024-11-14T16:04:50.718Z",
-    "voteTitle": "Updated Vote Title",
-    "voteOptions": [
-      {
-        "id": "1",
-        "name": "New Option 1"
-      },
-      {
-        "id": "2",
-        "name": "New Option 2"
-      }
-    ]
-  },
-  {
-    "voteId": "5667bc4f-df71-4028-bec1-ab99d0707fd3",
-    "authorUid": "Hi",
-    "dateModified": "2024-11-14T16:05:16.002Z",
-    "voteTitle": "Updated Vote Title",
-    "voteOptions": [
-      {
-        "id": "1",
-        "name": "New Option 1"
-      },
-      {
-        "id": "2",
-        "name": "New Option 2"
-      }
-    ]
-  },
-  {
-    "voteId": "501d90b4-57fb-4fd3-a868-ce564a4fe235",
-    "authorUid": "Hi",
-    "dateModified": "2024-11-14T16:05:24.432Z",
-    "voteTitle": "Updated Vote Title",
-    "voteOptions": [
-      {
-        "id": "1",
-        "name": "New Option 1"
-      },
-      {
-        "id": "2",
-        "name": "New Option 2"
-      }
-    ]
-  },
-  {
-    "voteId": "515bba84-6819-4ed8-b841-eebd84bf59b1",
-    "authorUid": "Hi",
-    "dateModified": "2024-11-14T16:05:43.633Z",
-    "voteTitle": "Updated Vote Title",
-    "voteOptions": [
-      {
-        "id": "1",
-        "name": "New Option 1"
-      },
-      {
-        "id": "2",
-        "name": "New Option 2"
-      }
-    ]
-  },
-  {
-    "voteId": "c5c940b3-40b5-4d8b-b662-ab915b0ea35f",
-    "authorUid": "Hi",
-    "dateModified": "2024-11-14T16:06:20.853Z",
-    "voteTitle": "Updated Vote Title",
-    "voteOptions": [
-      {
-        "id": "1",
-        "name": "New Option 1"
-      },
-      {
-        "id": "2",
-        "name": "New Option 2"
-      }
-    ]
-  },
-  {
-    "voteId": "ae9d8cbd-8a5d-4ac6-8534-23c520a05408",
-    "authorUid": "Hi",
-    "dateModified": "2024-11-14T16:35:48.630Z",
-    "voteTitle": "Test Vote",
+    "voteId": "625d0439-d293-407e-a39e-10765a239643",
+    "authorUid": "a4e4a04c-0b99-4c3a-9a8d-ea62ba61974f",
+    "dateModified": "2024-11-16T14:27:29.506Z",
+    "voteTitle": "Write your Vote Title here",
     "voteOptions": [
       {
         "id": "1",
@@ -304,30 +16,10 @@
     ]
   },
   {
-    "voteId": "20f001f3-54b0-44dc-bb96-c8e6a593954d",
-    "authorUid": "Hi",
-    "dateModified": "2024-11-14T16:35:48.632Z",
-    "voteTitle": "Updated Test Vote",
-    "voteOptions": [
-      {
-        "id": "1",
-        "name": "Updated Option 1"
-      },
-      {
-        "id": "2",
-        "name": "Updated Option 2"
-      },
-      {
-        "id": "3",
-        "name": "New Option 3"
-      }
-    ]
-  },
-  {
-    "voteId": "fcb70ee9-452a-41c6-9ea6-8dc96db161ea",
-    "authorUid": "Hi",
-    "dateModified": "2024-11-14T16:36:35.919Z",
-    "voteTitle": "Test Vote",
+    "voteId": "03696c24-f9b5-4eb1-8e77-a6facf676953",
+    "authorUid": "a4e4a04c-0b99-4c3a-9a8d-ea62ba61974f",
+    "dateModified": "2024-11-16T15:31:55.876Z",
+    "voteTitle": "Write your Vote Title here 3",
     "voteOptions": [
       {
         "id": "1",
@@ -340,62 +32,50 @@
     ]
   },
   {
-    "voteId": "02822dd9-0630-4682-8dac-aee2021acd81",
-    "authorUid": "Hi",
-    "dateModified": "2024-11-14T16:36:35.923Z",
-    "voteTitle": "Updated Test Vote",
+    "voteId": "4a79c2c9-dbe6-4969-989b-1d2ad12ef37b",
+    "authorUid": "ca944b4e-fbcf-4ca8-b6ec-9085bdefa6c1",
+    "dateModified": "2024-11-17T15:08:50.585Z",
+    "voteTitle": "Write your Vote Title here",
     "voteOptions": [
       {
         "id": "1",
-        "name": "Updated Option 1"
+        "name": "New option"
       },
       {
         "id": "2",
-        "name": "Updated Option 2"
-      },
-      {
-        "id": "3",
-        "name": "New Option 3"
+        "name": "New option2"
       }
     ]
   },
   {
-    "voteId": "7f4c70ce-f626-45bb-a4c0-a17b8cdc5aac",
-    "authorUid": "Hi",
-    "dateModified": "2024-11-14T17:05:13.412Z",
-    "voteTitle": "Test Vote for Statistics",
+    "voteId": "ebcc356b-3ba1-4752-86bd-e942d6836a99",
+    "authorUid": "ca944b4e-fbcf-4ca8-b6ec-9085bdefa6c1",
+    "dateModified": "2024-11-17T14:18:44.040Z",
+    "voteTitle": "Write your Vote Title here",
     "voteOptions": [
       {
         "id": "1",
-        "text": "Option 1"
+        "name": "Option 1"
       },
       {
         "id": "2",
-        "text": "Option 2"
-      },
-      {
-        "id": "3",
-        "text": "Option 3"
+        "name": "Option 2"
       }
     ]
   },
   {
-    "voteId": "32c6a361-534e-494b-92ff-b1b087abd0be",
-    "authorUid": "Hi",
-    "dateModified": "2024-11-14T17:07:08.456Z",
-    "voteTitle": "Test Vote for Statistics",
+    "voteId": "fec618e2-7eac-4f05-9843-631bcdf7cd3b",
+    "authorUid": "1234567890",
+    "dateModified": "2024-11-18T13:11:48.360Z",
+    "voteTitle": "This is a sample voteWhat do you want for the party?",
     "voteOptions": [
       {
         "id": "1",
-        "text": "Option 1"
+        "name": "PlayStation"
       },
       {
         "id": "2",
-        "text": "Option 2"
-      },
-      {
-        "id": "3",
-        "text": "Option 3"
+        "name": "Switch"
       }
     ]
   }

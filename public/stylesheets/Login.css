@@ -1,24 +1,24 @@
 body {
     margin: 0;
     padding: 0;
-    font-family: 'Inter', sans-serif;
-    background-image: url('background.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    font-family: 'Inter', sans-serif;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 .login-container {
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: #fbfbfb;
     padding: 40px;
     border-radius: 10px;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
     max-width: 400px;
     width: 90%;
+    transition: 0.3s;
 }
 
 .title {
@@ -31,9 +31,14 @@ body {
 
 .subtitle {
     text-align: left;
-    margin-bottom: 30px;
+    margin-bottom: 15px;
     font-size: 24px;
     color: #666;
+}
+
+.login-form .form-group {
+    margin-bottom: 20px;
+    position: relative;
 }
 
 .login-form input {
@@ -43,9 +48,46 @@ body {
     border-radius: 5px;
     font-size: 16px;
     font-family: 'Inter', sans-serif;
-    transition: border-color 0.3s ease; /* Smooth transition */
-    color: #6b72e1; /* Set default text color */
-    background: transparent; /* Transparent background */
+    color: #6b72e1;
+    background: transparent;
+    transition: border-color 0.3s ease;
+    top: 3px;
+}
+
+.login-form input:focus {
+    font-size: 16px;
+    bottom: -10px;
+}
+
+.login-form label {
+    position: absolute;
+    left: 10px;
+    top: 12px;
+    color: #ababab;
+    font-size: 16px;
+    transition: 0.2s;
+    pointer-events: none;
+}
+
+.login-form input:focus ~ label,
+.login-form input:not(:placeholder-shown) ~ label {
+    top: 0.9px;
+    left: 10px;
+    font-size: 11px;
+    color: #6b72e1;
+}
+
+.login-form input::placeholder {
+    color: transparent;
+}
+
+.eye-icon {
+    position: absolute;
+    right: 10px;
+    top: 20px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #2d2d2d;
 }
 
 .login-form .forgot-credentials {
@@ -58,7 +100,7 @@ body {
     width: 100%;
     padding: 10px;
     background-color: #6b72e1;
-    color: #fff;
+    color: #fbfbfb;
     border: none;
     border-radius: 5px;
     font-size: 16px;
@@ -70,9 +112,8 @@ body {
 .login-form .login-button:hover {
     opacity: 1;
     background-color: #3543ff;
-    color: #ffffff;
+    color: #fbfbfb;
 }
-
 
 .login-form .sign-up {
     color: #6b72e1;
@@ -80,64 +121,27 @@ body {
     font-size: 14px;
 }
 
-
-.login-form .form-group {
-    margin-bottom: 20px;
-    position: relative; /* Needed for label positioning */
+p {
+    color: #2d2d2d;
 }
 
-.login-form input {
-    width: 95%; /* Adjusted width */
-    padding: 10px;
-    border: 1px solid #ababab;
-    border-radius: 5px;
-    font-size: 16px;
-    font-family: 'Inter', sans-serif;
-    transition: border-color 0.3s ease; /* Smooth transition */
-    color: #6b72e1; /* Input text color */
-    background: transparent; /* Transparent background */
-    top: 3px; /* Move label up */
-
+@media(max-width: 550px) {
+    .login-container {
+        background-color: #ffffff;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: none;
+        max-width: 400px;
+        width: 90%;
+        transition: 0.3s;
+    }
 }
 
-/* Label styles for floating effect */
-.login-form label {
-    position: absolute;
-    left: 10px; /* Adjust as needed */
-    top: 12px; /* Adjusted default position for better alignment */
-    color: #ababab; /* Default label color */
-    font-size: 16px; /* Same as input font size */
-    transition: 0.2s; /* Smooth transition */
-    pointer-events: none;
+.is-invalid{
+    outline: 2px solid #dc3545;
 }
 
-
-/* Reduce font size of input text when focused */
-.login-form input:focus {
-    font-size: 16px; /* Smaller input text size on focus */
-    bottom: -10px;
-
-}
-
-/* Shrink the label when input is focused */
-.login-form input:focus ~ label,
-.login-form input:not(:placeholder-shown) ~ label {
-    top: 0.9px; /* Move label up */
-    left: 10px; /* Keep label aligned */
-    font-size: 11px; /* Smaller font size */
-    color: #6b72e1; /* Change color */
-}
-
-/* Hide the placeholder text */
-.login-form input::placeholder {
-    color: transparent; /* Hide the placeholder */
-}
-
-.eye-icon {
-    position: absolute;
-    right: 10px; /* Adjust the position */
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer; /* Pointer on hover */
-    color: #000000; /* Eye icon color */
+.invalid-feedback{
+    color: #dc3545;
+    margin-top: 10px;
 }

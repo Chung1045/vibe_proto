@@ -5,6 +5,8 @@ import cookieSession from "cookie-session"
 import {fileURLToPath} from 'url';
 import * as databaseHelper from './public/javascripts/databaseHelper.js';
 import {voteForOptions} from "./public/javascripts/databaseHelper.js";
+import * as backdropHelper from "./public/javascripts/backdropHelper.js";
+import {v4 as uuid} from 'uuid';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,37 +31,53 @@ app.use(cookieSession({
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
 
-app.get("/dashboard", async (req, res) => {
+// Authentication middleware
+const requireAuth = (req, res, next) => {
+    if (!req.session || !req.session.authenticated) {
+        return res.redirect('/login');
+    }
+    next();
+};
+
+app.get("/", (req, res) => {
+    res.redirect("/login");
+});
+
+app.get("/dashboard", requireAuth, async (req, res) => {
     try {
-        const voteData = await databaseHelper.getVoteData();
-        res.render("dashboard", {voteData: voteData});
+        const allVoteData = await databaseHelper.getVoteData();
+
+        // Filter the vote data to only include votes authored by the current user
+        const userVoteData = allVoteData.filter(vote => vote.authorUid === req.session.uid);
+
+        res.render("dashboard", {voteData: userVoteData});
     } catch (error) {
         console.error("Error fetching vote data:", error);
         res.status(500).send("Error fetching vote data");
     }
 });
 
-app.get("/login", (req, res) => {
-    if (req.session.authenticated) {
-        res.redirect("/index");
-    } else {
-        res.render("login");
+app.get("/register", (req, res) => {
+    // Check if user is already authenticated
+    if (req.session && req.session.authenticated) {
+        return res.redirect("/index");
     }
+    res.render("Register");
 });
 
-app.get("/register", (req, res) => {
-    if (req.session.authenticated) {
-        res.redirect("/index");
-    } else {
-        res.render("Register");
+app.get("/login", (req, res) => {
+    // Check if user is already authenticated
+    if (req.session && req.session.authenticated) {
+        return res.redirect("/index");
     }
+    res.render("login");
 });
 
 app.get("/navbar", (req, res) => {
     res.render("navbar");
 });
 
-app.get("/settings", (req, res) => {
+app.get("/settings", requireAuth, (req, res) => {
     res.render("settings");
 });
 
@@ -95,7 +113,7 @@ app.post("/api/user/change-username", async (req, res) => {
         return res.status(401).json({success: false, message: "User is not logged in, cannot perform action"});
     }
     try {
-        const result = await databaseHelper.changeUserName(req.session.uid, req.body.newUsername);
+        const result = await databaseHelper.changeUserName(req.session.uid, req.body.newUserName);
         res.json({success: true, message: "Change username successful", newUsername: result.username});
     } catch (error) {
         console.error("Error changing username:", error);
@@ -107,11 +125,11 @@ app.post("/api/user/change-password", async (req, res) => {
     if (!req.session.authenticated) {
         return res.status(401).json({success: false, message: "User is not logged in, cannot perform action"});
     }
-    if (!req.body.newPassword || !req.body.oldPassword) {
+    if (!req.body.newPassword || !req.body.currentPassword) {
         return res.status(400).json({success: false, message: "Please provide your old and new password"});
     }
     try {
-        const result = await databaseHelper.changeUserName(req.session.uid, req.body.oldPassword, req.body.newPassword);
+        const result = await databaseHelper.changeUserPassword(req.session.uid, req.body.currentPassword, req.body.newPassword);
         res.json({success: true, message: "Change password successful"});
     } catch (error) {
         console.error("Error changing password:", error);
@@ -137,24 +155,44 @@ app.post("/api/user/change-email", async (req, res) => {
     }
 });
 
-app.post("/api/user/register", async (req, res) => {
-    if (req.session.authenticated) {
-        return res.status(400).json({success: false, message: "User is already logged in, cannot register a new account"});
+app.post("/api/user/change-phone-number", async (req, res) => {
+    if (!req.session.authenticated) {
+        return res.status(401).json({success: false, message: "User is not logged in, cannot perform action"});
     }
 
-    const { username, password, email, phoneNum } = req.body;
-
-    if (!username || !password || !email || !phoneNum) {
-        return res.status(400).json({success: false, message: "Please provide all required fields"});
+    if (!req.body.newPhoneNum) {
+        return res.status(400).json({success: false, message: "Please provide new phone number"});
     }
 
     try {
-        const result = await databaseHelper.createNewUser(username, password, email, phoneNum);
+        const result = await databaseHelper.changeUserPhoneNumber(req.session.uid, req.body.newPhoneNum);
+        res.json({success: true, message: "Phone number changed successfully", newPhoneNum: result.phoneNum});
+    } catch (error) {
+        res.status(400).json({success: false, message: error.message});
+    }
+
+});
+
+app.post("/api/user/register", async (req, res) => {
+    // Check if user is already logged in
+    if (req.session && req.session.authenticated) {
+        return res.status(400).json({
+            success: false,
+            message: "User is already logged in, please log out first"
+        });
+    }
+
+    const {username, password, email, phoneNum} = req.body;
+
+    try {
+        const result = await databaseHelper.createNewUser(uuid(), username, password, email, phoneNum);
 
         // Set session data
-        req.session.authenticated = true;
-        req.session.uid = result.uid;
-        req.session.username = username;
+        req.session = {
+            authenticated: true,
+            uid: result.uid,
+            username: username
+        };
 
         res.json({
             success: true,
@@ -164,17 +202,35 @@ app.post("/api/user/register", async (req, res) => {
             email: result.userInfo.email
         });
     } catch (error) {
-        console.error("Error registering user:", error);
+        // Catch the error and send it back to the client
+        console.error("Error during user registration:", error.message); // Log the error for debugging
         res.status(400).json({success: false, message: error.message});
     }
 });
 
-app.post("/api/user/logout", async (req, res) => {
-    if (req.session.authenticated) {
-        req.session = null;
-        res.json({success: true, message: "Logout successful", redirect: "/login"});
-    } else {
-        res.status(401).json({success: false, message: "Logout failed due to session not found", redirect: "/login"});
+app.post("/api/user/logout", (req, res) => {
+    // Destroy the session
+    req.session = null;
+    res.status(200).json({
+        success: true,
+        message: "Logout successful"
+    });
+
+});
+
+app.post("/api/user/fetchInfo", async (req, res) => {
+    if (!req.session.authenticated) {
+        return res.status(401).json({success: false, message: "User is not logged in, cannot perform action"});
+    }
+    try {
+        let userInfo = await databaseHelper.fetchUserInfo(req.session.uid);
+        if (!userInfo) {
+            return res.status(404).json({success: false, message: "User information not found"});
+        }
+        res.json({success: true, data: userInfo});
+    } catch (error) {
+        console.error("Error fetching user info:", error);
+        res.status(500).json({success: false, message: "Error fetching user info"});
     }
 });
 
@@ -183,27 +239,26 @@ app.post("/api/vote/vote-for-options", async (req, res) => {
         try {
             // Extract userUID from session, and voteID and voteOptionID from the request body
             const userUID = req.session.uid;
-            const { voteID, voteOptionID } = req.body;
+            const {voteID, voteOptionID} = req.body;
 
             // Validate input
             if (!voteID || !voteOptionID) {
-                return res.status(400).json({ error: "Invalid voteID or voteOptionID" });
+                return res.status(400).json({error: "Invalid voteID or voteOptionID"});
             }
 
             // Call the voteForOptions function to register the vote
             const updatedVoteRecord = await voteForOptions(userUID, voteID, voteOptionID);
 
             // Send a success response with the updated vote record
-            res.status(200).json({ message: "Vote recorded successfully", updatedVoteRecord });
+            res.status(200).json({message: "Vote recorded successfully", updatedVoteRecord});
         } catch (err) {
             console.error("Error in voteForOptions:", err);
-            res.status(500).json({ error: err.message });
+            res.status(500).json({error: err.message});
         }
     } else {
-        res.status(401).json({ error: "Unauthorized. Please log in." });
+        res.status(401).json({error: "Unauthorized. Please log in."});
     }
 });
-
 
 app.post("/api/vote/update", async (req, res) => {
     const voteData = req.body;
@@ -211,7 +266,7 @@ app.post("/api/vote/update", async (req, res) => {
 
     try {
         const updatedVote = await databaseHelper.updateVote(req.session.uid, voteData.voteId, voteData);
-        res.json({success: true, message: "Vote saved successfully", vote: updatedVote});
+        res.json({success: true, message: "Vote saved successfully", vote: updatedVote, voteID: updatedVote.voteId});
     } catch (error) {
         console.error("Error updating vote:", error);
         res.status(500).json({success: false, message: "Error updating vote", error: error.message});
@@ -221,7 +276,8 @@ app.post("/api/vote/update", async (req, res) => {
 app.post("/api/vote/delete", async (req, res) => {
     const voteId = req.body.voteId;
     try {
-        await databaseHelper.removeVoteEntry(voteId);
+        console.log(`Deleting vote ${voteId}`);
+        await databaseHelper.removeVoteEntry(req.session.uid, voteId);
         console.log(`Vote ${voteId} deleted successfully`);
     } catch (err) {
         console.error("Error deleting vote:", err);
@@ -229,11 +285,114 @@ app.post("/api/vote/delete", async (req, res) => {
     }
 });
 
+app.post("/api/vote/getStat", async (req, res) => {
+    try {
+        const {voteId} = req.body;
+        if (!voteId) {
+            return res.status(400).json({error: 'voteId is required'});
+        }
+
+        const voteStatistics = await databaseHelper.getVoteStatistics(voteId);
+
+        res.json(voteStatistics);
+    } catch (error) {
+        console.error('Error fetching vote statistics:', error);
+        if (error.message.includes('not found')) {
+            res.status(404).json({error: error.message});
+        } else {
+            res.status(500).json({error: 'Internal server error'});
+        }
+    }
+});
+
+app.post("/api/vote/check-voted", async (req, res) => {
+    try {
+        console.log("Checking if user has voted");
+        const hasVoted = await databaseHelper.checkIfVoted(req.body.voteID, req.session.uid);
+        console.log("User has voted:", hasVoted);
+        res.json({hasVoted: hasVoted});
+    } catch (error) {
+        console.error("Error checking if user has voted:", error);
+        res.status(500).json({error: "An error occurred while checking vote status"});
+    }
+});
+
+app.post("/api/vote/get-vote-option", async (req, res) => {
+    const voteId = req.body.voteId;
+    if (!voteId) {
+        return res.status(400).json({error: "voteId is required"});
+    }
+
+    try {
+        const voteOption = await databaseHelper.getVotedOption(req.session.uid, voteId);
+        res.json({voteOption});
+    } catch (error) {
+        console.error("Error fetching vote option:", error);
+        if (error.message.includes("not found")) {
+            res.status(404).json({error: error.message});
+        } else {
+            res.status(500).json({error: "Internal server error"});
+        }
+    }
+});
+
+app.post("/api/vote/get-vote-author", async (req, res) => {
+    const voteId = req.body.voteId;
+    console.log("Fetching vote author for voteId:", voteId);
+    if (!voteId) {
+        return res.status(400).json({error: "voteId is required"});
+    }
+
+    try {
+        const voteAuthor = await databaseHelper.getVoteAuthor(voteId);
+        console.log("Vote author:", voteAuthor);
+        res.json({voteAuthor});
+    } catch (error) {
+        console.error("Error fetching vote author:", error);
+    }
+});
+
+app.post("/api/vote/getDateModified", async (req, res) => {
+    const voteId = req.body.voteId; // Changed from req.query.voteId to req.body.voteId
+    try {
+        const vote = await databaseHelper.getVoteById(voteId);
+        if (vote) {
+            res.json({dateModified: vote.dateModified});
+        } else {
+            res.status(404).json({error: "Vote not found"});
+        }
+    } catch (error) {
+        console.error("Error fetching vote date modified:", error);
+        res.status(500).json({error: "Internal server error"});
+    }
+});
+
+app.post("/api/getBackDrop", async (req, res) => {
+    try {
+        const backgroundURL = await backdropHelper.fetchUnsplashBackground();
+        res.json({ success: true, backgroundURL });
+    } catch (e) {
+        console.error("Error fetching backdrop:", e);
+        res.status(500).json({ success: false, error: "Internal server error" });
+    }
+});
+
 // Fallback route should be placed at the end
 app.get("*", async (req, res) => {
     try {
         const voteData = await databaseHelper.getVoteData();
-        res.render("index", {voteData: voteData});
+        const userVotes = {};
+
+        if (req.session.authenticated) {
+            for (const vote of voteData) {
+                const hasVoted = await databaseHelper.checkIfVoted(vote.voteId, req.session.uid);
+                if (hasVoted) {
+                    const stats = await databaseHelper.getVoteStatistics(vote.voteId);
+                    userVotes[vote.voteId] = stats;
+                }
+            }
+        }
+        res.render("index", {voteData: voteData, userVotes: userVotes, isAuthenticated: req.session.authenticated});
     } catch (error) {
         console.error("Error fetching vote data:", error);
         res.status(500).send("Error fetching vote data");

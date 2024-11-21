@@ -1,5 +1,6 @@
 $(document).ready(function () {
-    // Initialize Masonry
+    let isCreatingNewVote = false;
+
     var $grid = $('#container').masonry({
         itemSelector: '.card',
         columnWidth: '.card',
@@ -28,21 +29,32 @@ $(document).ready(function () {
     $(document).on('click', '#btn-fab-createVote', function () {
         let containerView = $('#container');
 
+        if (isCreatingNewVote) {
+            showAlert('Please finish creating the current vote before starting a new one.', "warning")
+            return;
+        }
+
+        isCreatingNewVote = true;
 
         const newCardStruct = $(`
-    <div class="card" id="vote_card" data-vote-id="new-temporarily" data-creation-type="new" style="position: absolute; left: 20px; top: 20px;">
-        <p>Title</p><div contenteditable="" class="editable_title" style="margin: 0px 0px 15px; display: block; width: 100%;">Write your Vote Title here</div>
-        <p>Options</p>
-        <div id="vote_option_list" data-vote-id="new-temporarily">
-            <div class="option-wrapper"><div contenteditable="" class="editable_options" data-option-id="1" data-vote-id="new-temporarily" style="display: block;">Option 1</div></div>
-            <div class="option-wrapper"><div contenteditable="" class="editable_options" data-option-id="2" data-vote-id="new-temporarily" style="display: block;">Option 2</div></div>
+        <div class="card" id="vote_card" data-vote-id="new-temporarily" data-creation-type="new" style="position: absolute; left: 20px; top: 20px;">
+            <p>Title</p>
+            <div contenteditable="" class="editable_title" style="margin: 0px 0px 15px; display: block; width: 100%;">Write your Vote Title here</div>
+            <p>Options</p>
+            <div id="vote_option_list" data-vote-id="new-temporarily">
+                <div class="option-wrapper"><div contenteditable="" class="editable_options" data-option-id="1" data-vote-id="new-temporarily" style="display: block;">Option 1</div></div>
+                <div class="option-wrapper"><div contenteditable="" class="editable_options" data-option-id="2" data-vote-id="new-temporarily" style="display: block;">Option 2</div></div>
+            </div>
+            <div class="div-edit-options">
+                <hr class="editable_hr">
+                <div class="editable_addOptions">Add new options</div>
+            </div>
+            <div class="d-flex justify-content-end" id="div_container_action_button">
+            <p class="p-last-modified" data-vote-id="new-temporarily" data-date-modified="${new Date().toISOString()}"><span class="time-ago">now</span></p>
+                <img src="/images/icns/trash-fill.svg" alt="icon" id="btn-delete">
+                <img src="/images/icns/check2.svg" alt="icon" id="btn-save-changes">
+            </div>
         </div>
-        <div class="div-edit-options"><hr class="editable_hr"><div class="editable_addOptions">Add new options</div></div>
-        <div class="d-flex justify-content-end" id="div_container_action_button">
-            <img src="/images/icns/trash-fill.svg" alt="icon" id="btn-delete">
-            <img src="/images/icns/check2.svg" alt="icon" id="btn-save-changes">
-        </div>
-    </div>
     `);
 
         // Prepend the new card to the container (at the top)
@@ -50,6 +62,7 @@ $(document).ready(function () {
 
         // Add the new item to Masonry
         $grid.masonry('prepended', newCardStruct);
+        checkVoteEntryNum();
 
         // Recalculate Masonry layout
         $grid.masonry('layout');
@@ -98,16 +111,19 @@ $(document).ready(function () {
                         voteId: voteID
                     }),
                     contentType: 'application/json',
-                    success: function(response) {
-                        console.log('Vote deleted successfully:', response);
+                    success: function (response) {
+                        showAlert('Vote deleted successfully.', "success");
+                        checkVoteEntryNum();
                     },
-                    error: function(xhr, status, error) {
-                        console.error('Error deleting vote:', error);
+                    error: function (xhr, status, error) {
+                        showAlert(`Error deleting vote: ${error}`, "danger");
                     }
                 });
                 let voteEntry = document.querySelector(`.card[data-vote-id="${voteID}"]`);
                 $(voteEntry).remove();
                 $grid.masonry('layout');
+                showAlert("Vote entry removed", "success");
+                checkVoteEntryNum();
             }
         }
     });
@@ -118,7 +134,7 @@ $(document).ready(function () {
 
         // Collect edited data
         const newTitle = card.find('.editable_title').text();
-        const newOptions = card.find('.editable_options').map(function() {
+        const newOptions = card.find('.editable_options').map(function () {
             return $(this).text();
         }).get();
 
@@ -165,10 +181,12 @@ $(document).ready(function () {
     function extractVoteCardData(card) {
         const voteID = card.attr('data-vote-id');
         const title = card.find('#text_voteTitle_h2').text();
-        const options = card.find('.text_voteOptions_p').map(function() {
+        const options = card.find('.text_voteOptions_p').map(function () {
             return {
                 id: $(this).attr('data-option-id'),
-                name: $(this).text()
+                name: $(this).contents().filter(function () {
+                    return this.nodeType === 3;
+                }).text().trim()
             };
         }).get();
 
@@ -180,20 +198,96 @@ $(document).ready(function () {
     }
 
     function saveVoteData(voteData) {
-        $.ajax({
-            url: '/api/vote/update',
-            method: 'POST',
-            data: JSON.stringify(voteData),
-            contentType: 'application/json',
-            success: function(response) {
-                console.log('Vote updated successfully:', response);
-                // You can add a visual feedback here, like a toast notification
-            },
-            error: function(xhr, status, error) {
-                console.error('Error updating vote:', error);
-                // You can add error handling here, like showing an error message to the user
-            }
+        return new Promise((resolve, reject) => {
+            const isNewVote = voteData.voteId === 'new-temporarily';
+            const url = '/api/vote/update';
+
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: JSON.stringify(voteData),
+                contentType: 'application/json',
+                success: function (response) {
+                    if (response.success) {
+                        console.log(isNewVote ? 'Vote created successfully:' : 'Vote updated successfully:', response);
+                        if (isNewVote) {
+                            showAlert("Vote created successfully", "success");
+                        } else {
+                            showAlert("Vote updated successfully", "success");
+                        }
+
+                        const newVoteId = response.voteID || response.vote.voteId;
+                        const card = $(`.card[data-vote-id="${isNewVote ? 'new-temporarily' : voteData.voteId}"]`);
+
+                        if (isNewVote && newVoteId) {
+                            updateVoteId('new-temporarily', newVoteId);
+                            isCreatingNewVote = false; // Reset the flag after successful creation
+                        }
+
+                        // Update card content
+                        updateCardContent(card, voteData, newVoteId);
+
+                        const lastModifiedElement = card.find('.p-last-modified');
+                        if (response.vote && response.vote.dateModified) {
+                            lastModifiedElement.attr('data-date-modified', response.vote.dateModified);
+                            updateAllTimeAgo();
+                        } else {
+                            // If dateModified is not in the response, fetch it
+                            $.ajax({
+                                url: '/api/vote/getDateModified',
+                                method: 'GET',
+                                data: {voteId: newVoteId},
+                                success: function (dateResponse) {
+                                    lastModifiedElement.attr('data-date-modified', dateResponse.dateModified);
+                                    updateAllTimeAgo();
+                                },
+                                error: function (xhr, status, error) {
+                                    console.error('Error fetching updated date modified:', error);
+                                    showAlert(`Error fetching updated date modified:\n${error}`, "danger");
+                                }
+                            });
+                        }
+
+                        // Recalculate Masonry layout
+                        $grid.masonry('layout');
+
+                        resolve(); // Resolve the promise on success
+                    } else {
+                        if (isNewVote){
+                            showAlert(`Error creating new vote:\n${response.message}`, "danger")
+                        } else {
+                            showAlert(`Error updating vote:\n${response.message}`, "danger")
+                        }
+                        console.error(isNewVote ? 'Error creating vote:' : 'Error updating vote:', response.message);
+                        reject(new Error(response.message));
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error(isNewVote ? 'Error creating vote:' : 'Error updating vote:', error);
+                    if (isNewVote){
+                        showAlert(`Error creating new vote:\n${response.message}`, "danger")
+                    } else {
+                        showAlert(`Error updating vote:\n${response.message}`, "danger")
+                    }
+                    reject(error);
+                }
+            });
         });
+    }
+
+
+    function updateVoteId(oldVoteId, newVoteId) {
+        const card = $(`.card[data-vote-id="${oldVoteId}"]`);
+        if (card.length) {
+            // Update card
+            card.attr('data-vote-id', newVoteId);
+
+            card.find(`#vote_option_list[data-vote-id="${oldVoteId}"]`).attr('data-vote-id', newVoteId);
+            card.find(`.editable_options[data-vote-id="${oldVoteId}"]`).attr('data-vote-id', newVoteId);
+            card.find(`#text_voteTitle_h2[data-vote-id="${oldVoteId}"]`).attr('data-vote-id', newVoteId);
+            card.find(`.p-last-modified[data-vote-id="${oldVoteId}"]`).attr('data-vote-id', newVoteId);
+            card.find(`.text_voteOptions_p[data-vote-id="${oldVoteId}"]`).attr('data-vote-id', newVoteId);
+        }
     }
 
     // Function to add a new editable option
@@ -203,18 +297,16 @@ $(document).ready(function () {
         let newOption = $('<div contenteditable />').addClass('editable_options').text('New option');
         let deleteIcon = $('<img/>').attr('src', '/images/icns/trash-fill.svg').addClass('delete-option-icon');
 
-        // Append the option and the delete icon to the wrapper
         newOptionWrapper.append(newOption, deleteIcon);
         optionsList.append(newOptionWrapper);
 
-        // Handle input for the new option
         newOption.on('input', function () {
-            $grid.masonry('layout'); // Recalculate layout when input changes
+            $grid.masonry('layout');
         });
 
         deleteIcon.on('click', function () {
             newOptionWrapper.remove();
-            $grid.masonry('layout'); // Update Masonry layout
+            $grid.masonry('layout');
             checkOptionsCount(optionsList);
         });
 
@@ -243,24 +335,19 @@ $(document).ready(function () {
         let newOptionsBt = $('<div/>').text("Add new options").addClass("editable_addOptions");
         let horizontalRule = $('<hr/>').addClass("editable_hr");
 
-        // Make title editable
         makeElementEditable(title, parentElement);
 
-        // Make options editable
         options.each(function () {
             makeOptionEditable($(this), voteID);
         });
 
 
-        // Append the "Add new options" button after the options list
         divEditOptions.append(horizontalRule, newOptionsBt);
         optionsList.after(divEditOptions);
 
-        // Change edit button icon
         editButton.attr('src', '/images/icns/check2.svg');
         editButton.attr('id', 'btn-save-changes');
 
-        // Check and update delete button visibility
         checkOptionsCount(optionsList);
     }
 
@@ -293,7 +380,9 @@ $(document).ready(function () {
 
     // Function to make an option editable
     function makeOptionEditable(option, voteID) {
-        let currentText = option.text();
+        let currentText = option.contents().filter(function () {
+            return this.nodeType === 3; // Get only the text node
+        }).text().trim(); // Get the text content without the percentage
         let originalStyles = option.attr('style');
         let optionId = option.attr('data-option-id');
 
@@ -306,6 +395,12 @@ $(document).ready(function () {
             .attr('data-option-id', optionId)
             .attr('data-vote-id', voteID)
             .css({'display': 'block'});
+
+        // Preserve the percentage span if it exists
+        let percentageSpan = option.find('.vote-percentage');
+        if (percentageSpan.length) {
+            inputElement.after(percentageSpan);
+        }
 
         optionWrapper.append(inputElement, deleteIcon);
         option.replaceWith(optionWrapper);
@@ -323,5 +418,266 @@ $(document).ready(function () {
             $grid.masonry('layout');
         });
     }
+
+    function fetchDateModified() {
+        const deferreds = [];
+        $('.p-last-modified').each(function () {
+            const element = $(this);
+            const voteId = element.data('vote-id');
+            const deferred = $.Deferred();
+            deferreds.push(deferred);
+            $.ajax({
+                url: '/api/vote/getDateModified',
+                method: 'POST',
+                data: {voteId: voteId},
+                success: function (response) {
+                    element.attr('data-date-modified', response.dateModified);
+                    deferred.resolve();
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching date modified:', error);
+                    deferred.reject();
+                }
+            });
+        });
+
+        $.when.apply($, deferreds).then(function () {
+            updateAllTimeAgo();
+        });
+    }
+
+    function formatTimeAgo(date) {
+        const now = new Date();
+        const diffInSeconds = Math.floor((now - date) / 1000);
+
+        if (diffInSeconds < 60) return 'now';
+        if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m`;
+        if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h`;
+        if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)}d`;
+        if (diffInSeconds < 31536000) return `${Math.floor(diffInSeconds / 2592000)}mo`;
+        return `${Math.floor(diffInSeconds / 31536000)} yr`;
+    }
+
+    // Call updateTimeAgo initially
+    function updateAllTimeAgo() {
+        $('.p-last-modified').each(function () {
+            const element = $(this);
+            const dateModifiedAttr = element.attr('data-date-modified');
+            if (dateModifiedAttr) {
+                const dateModified = new Date(dateModifiedAttr);
+                const timeAgoSpan = element.find('.time-ago');
+                timeAgoSpan.text(formatTimeAgo(dateModified));
+            }
+        });
+    }
+
+    async function getVoteStatistics(voteID) {
+        try {
+            const response = await fetch('/api/vote/getStat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({voteId: voteID}),
+            });
+
+            if (!response.ok) {
+                showAlert(`Error: Failed to fetch vote results:\n${response.status}`)
+                throw new Error(`Failed to fetch vote results: ${response.status}`);
+            }
+            return await response.json();
+        } catch (error) {
+            showAlert(`Error: Failed to fetch vote results:\n${error}`);
+            console.error('Error: Failed to fetch vote results:', error);
+            return null;
+        }
+    }
+
+    function updateCardContent(card, voteData, newVoteId) {
+        // Update vote ID
+        card.attr('data-vote-id', newVoteId);
+
+        // Update title
+        card.find('#text_voteTitle_h2').text(voteData.voteTitle).attr('data-vote-id', newVoteId);
+
+        // Update options
+        const optionsList = card.find('#vote_option_list');
+        optionsList.attr('data-vote-id', newVoteId);
+
+        // Clear existing options
+        optionsList.empty();
+
+        // Add updated options
+        voteData.voteOptions.forEach((option) => {
+            const optionElement = $('<p>')
+                .addClass('text_voteOptions_p')
+                .attr({
+                    'data-vote-id': newVoteId,
+                    'data-option-id': option.id
+                });
+
+            // Add the option text as a text node
+            optionElement.append(document.createTextNode(option.name));
+
+            // Add the percentage span
+            const percentageSpan = $('<span>').addClass('vote-percentage').text('0%');
+            optionElement.append(percentageSpan);
+
+            optionsList.append(optionElement);
+        });
+
+        // Update edit button
+        card.find('#btn-save-changes').attr({
+            'src': '/images/icns/pencil-square.svg',
+            'id': 'btn-edit'
+        });
+
+        // Trigger an update of the vote display
+        updateVoteDisplay(card);
+    }
+
+    async function updateVoteDisplay(card) {
+        // Convert to jQuery object if it's not already one
+        const $card = $(card);
+        const voteID = $card.attr('data-vote-id');
+
+        // If voteID is 'new-temporarily', skip updating as it won't have statistics yet
+        if (voteID === 'new-temporarily') {
+            console.log('Skipping update for new vote card');
+            return;
+        }
+
+        const options = $card.find('.text_voteOptions_p');
+
+        try {
+            const voteResults = await getVoteStatistics(voteID);
+
+            if (!voteResults || typeof voteResults.options !== 'object') {
+                console.log('No vote results available for', voteID);
+                resetVoteStatistics($card);
+                return;
+            }
+
+            const hasVotes = Object.values(voteResults.options).some(option => option.percentage > 0);
+
+            if (hasVotes) {
+                $card.addClass('voted');
+            } else {
+                $card.removeClass('voted');
+            }
+
+            let maxPercentage = 0;
+            let maxOptionId = null;
+
+            options.each(function () {
+                const option = $(this);
+                const optionID = option.data('option-id');
+                const optionResult = voteResults.options[optionID];
+
+                let percentageSpan = option.find('.vote-percentage');
+                if (percentageSpan.length === 0) {
+                    percentageSpan = $('<span class="vote-percentage"></span>');
+                    option.append(percentageSpan);
+                }
+
+                if (hasVotes && optionResult) {
+                    const percentage = optionResult.percentage.toFixed(1);
+                    percentageSpan.text(`${percentage}%`);
+                    option.css('--option-percentage', `${percentage}%`);
+
+                    if (optionResult.percentage > maxPercentage) {
+                        maxPercentage = optionResult.percentage;
+                        maxOptionId = optionID;
+                    }
+                } else {
+                    percentageSpan.text('0%');
+                    option.css('--option-percentage', '0%');
+                }
+            });
+
+            // Highlight the most voted option
+            options.each(function () {
+                const option = $(this);
+                if (option.data('option-id') === maxOptionId) {
+                    option.addClass('most-voted');
+                } else {
+                    option.removeClass('most-voted');
+                }
+            });
+
+        } catch (error) {
+            showAlert(`Error updating vote info:\n${error}`, "danger");
+            console.error('Error updating vote display:', error);
+        }
+
+        // Recalculate Masonry layout
+        $grid.masonry('layout');
+    }
+
+    function checkVoteEntryNum() {
+        const voteCards = document.querySelectorAll('.card');
+        const $emptyMessage = $('#empty_message_div');
+        const duration = 400; // Duration of the fade effect in milliseconds
+
+        if (voteCards.length === 0) {
+            $emptyMessage.css('visibility', 'visible').hide().fadeIn(duration);
+        } else {
+            $emptyMessage.fadeOut(duration, function () {
+                $(this).css('visibility', 'hidden');
+            });
+        }
+    }
+
+    function showAlert(message, type = 'info', duration = 5000) {
+        const alertId = 'alert-' + Date.now(); // Generate a unique ID for the alert
+        const alertHtml = `
+        <div id="${alertId}" class="alert alert-${type} alert-dismissible fade" role="alert" style="display: none;">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `;
+        const $alert = $(alertHtml);
+        $("#alertContainer").append($alert);
+
+        // Fade in the alert
+        $alert.fadeIn(300, function () {
+            $(this).addClass('show');
+        });
+
+        // Set up auto-dismiss
+        const dismissAlert = () => {
+            $alert.fadeOut(300, function () {
+                $(this).remove();
+            });
+        };
+
+        // Automatically remove the alert after the specified duration
+        const timeoutId = setTimeout(dismissAlert, duration);
+
+        // Clear the timeout if the alert is manually closed
+        $alert.find('.btn-close').on('click', function () {
+            clearTimeout(timeoutId);
+            dismissAlert();
+        });
+    }
+
+    async function main() {
+        fetchDateModified();
+
+        setInterval(updateAllTimeAgo, 60000);
+
+        $('.card').each(function () {
+            const $card = $(this);
+            const voteID = $card.attr('data-vote-id');
+            if (voteID && voteID !== 'new-temporarily') {
+                updateVoteDisplay($card);
+            }
+        });
+
+        checkVoteEntryNum();
+    }
+
+    main();
+
 
 });

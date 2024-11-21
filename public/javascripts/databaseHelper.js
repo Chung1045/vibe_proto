@@ -2,7 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import {v4 as uuid} from 'uuid';
 import {fileURLToPath} from 'url';
-import req from "express/lib/request.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -72,7 +71,6 @@ async function updateVote(userID, voteID, newVoteData) {
             } else {
                 return await insertNewVote(voteID, newVoteData);
             }
-
         } else {
             Object.assign(vote, newVoteData);
             vote.dateModified = new Date().toISOString();
@@ -103,12 +101,16 @@ async function insertNewVote(voteID, newVote) {
     }
 }
 
-async function removeVoteEntry(voteID) {
+async function removeVoteEntry(userUID, voteID) {
     console.log(`Removing vote entry with ID ${voteID}...`);
     const voteIndex = voteData.findIndex(item => item.voteId === voteID);
 
     if (voteIndex === -1) {
         throw new Error(`Vote entry with ID ${voteID} not found.`);
+    }
+
+    if (voteData[voteIndex].authorUid!== userUID) {
+        throw new Error(`User ${userUID} is not the author of the vote entry with ID ${voteID}. Cannot remove the vote entry.`);
     }
 
     const removedVote = voteData.splice(voteIndex, 1)[0];
@@ -251,8 +253,6 @@ async function getVoteStatistics(voteID) {
 
     // Calculate percentages and prepare the result
     const result = {
-        voteId: voteID,
-        totalVotes: totalVotes,
         options: {}
     };
 
@@ -261,7 +261,6 @@ async function getVoteStatistics(voteID) {
         const percentage = totalVotes > 0 ? (count / totalVotes) * 100 : 0;
         result.options[option.id] = {
             optionText: option.text,
-            count: count,
             percentage: parseFloat(percentage.toFixed(2))
         };
     }
@@ -269,8 +268,39 @@ async function getVoteStatistics(voteID) {
     return result;
 }
 
+async function getVotedOption(uid, voteID) {
+    const voteRecord = voteRecords.find(item => item.voteId === voteID);
+    if (!voteRecord) {
+        throw new Error(`Vote record with ID ${voteID} not found.`);
+    }
+
+    const vote = voteData.find(item => item.voteId === voteID);
+    if (!vote) {
+        throw new Error(`Vote with ID ${voteID} not found in voteData.`);
+    }
+
+    // Find the user's vote in the voteStatistics
+    const userVote = voteRecord.voteStatistics.find(stat => stat.uid === uid);
+
+    if (!userVote) {
+        // User hasn't voted on this vote
+        return null;
+    }
+
+    // Find the corresponding option in voteData
+    const votedOption = vote.voteOptions.find(option => option.id === userVote.vote);
+
+    if (!votedOption) {
+        throw new Error(`Voted option with ID ${userVote.vote} not found in voteData.`);
+    }
+
+    return {
+        optionId: votedOption.id,
+    };
+}
+
 async function checkIfVoted(voteID, uid) {
-    console.log(`Checking if user ${userID} has voted for vote ${voteID}...`);
+    console.log(`Checking if user ${uid} has voted for vote ${voteID}...`);
 
     let vote = voteData.find(item => item.voteId === voteID);
     if (!vote) {
@@ -284,10 +314,29 @@ async function checkIfVoted(voteID, uid) {
         throw new Error(`Vote record with ID ${voteID} not found`);
     }
 
-    const hasVoted = voteRecord.voteStatistics.some(stat => stat.uid === userID);
+    const hasVoted = voteRecord.voteStatistics.some(stat => stat.uid === uid);
 
-    console.log(`User ${userID} has ${hasVoted ? '' : 'not '}voted for vote ${voteID}`);
+    console.log(`User ${uid} has ${hasVoted ? '' : 'not '}voted for vote ${voteID}`);
     return hasVoted;
+}
+
+async function getVoteById(voteId) {
+    return voteData.find(vote => vote.voteId === voteId);
+}
+
+async function getVoteAuthor(voteID) {
+    const vote = voteData.find(vote => vote.voteId === voteID);
+    if (!vote) {
+        throw new Error(`Vote with ID ${voteID} not found`);
+    }
+
+    const author = userData.find(user => user.uid === vote.authorUid);
+    if (!author) {
+        throw new Error(`Author with UID ${vote.authorUid} not found`);
+    }
+
+    console.log('Found author username:', author.username);
+    return author.username;
 }
 
 async function saveToUserDatabase() {
@@ -299,28 +348,39 @@ async function saveToUserDatabase() {
 async function changeUserName(uid, newUsername) {
     return new Promise(async (resolve, reject) => {
         console.log(`Changing username to ${newUsername}...`);
-        // Check if the new username is already taken
-        const existingUser = await searchUser(newUsername);
-        if (existingUser) {
-            console.error(`Username ${newUsername} is already occupied`);
-            reject(new Error(`Username ${newUsername} is already occupied`));
+
+        if (!newUsername) {
+            console.error("New username is undefined or empty");
+            return reject(new Error("New username is required"));
         }
 
-        // Find the user by UID
-        const userIndex = userData.findIndex(user => user.uid === uid);
-        if (userIndex === -1) {
-            console.error(`User with UID ${uid} not found`);
-            reject(new Error(`User with UID ${uid} not found`));
+        try {
+            // Check if the new username is already taken
+            const existingUser = await searchUser(newUsername);
+            if (existingUser && existingUser.uid !== uid) {
+                console.error(`Username ${newUsername} is already occupied`);
+                return reject(new Error(`Username ${newUsername} is already occupied`));
+            }
+
+            // Find the user by UID
+            const userIndex = userData.findIndex(user => user.uid === uid);
+            if (userIndex === -1) {
+                console.error(`User with UID ${uid} not found`);
+                return reject(new Error(`User with UID ${uid} not found`));
+            }
+
+            // Update the username
+            const oldUsername = userData[userIndex].username;
+            userData[userIndex].username = newUsername;
+
+            // Save the updated user data
+            await saveToUserDatabase();
+            console.log(`Username changed successfully from ${oldUsername} to ${newUsername}`);
+            resolve({success: true, username: newUsername});
+        } catch (error) {
+            console.error("Error in changeUserName:", error);
+            reject(error);
         }
-
-        // Update the username
-        const oldUsername = userData[userIndex].username;
-        userData[userIndex].username = newUsername;
-
-        // Save the updated user data
-        await saveToUserDatabase();
-        console.log(`Username changed successfully from ${oldUsername} to ${newUsername}`);
-        resolve({success: true, username: newUsername});
     });
 }
 
@@ -352,7 +412,7 @@ async function changeUserPhoneNumber(uid, newPhoneNumber) {
 
 async function changeUserPassword(uid, oldPassword, newPassword) {
     return new Promise(async (resolve, reject) => {
-        console.log(`Changing password for uid ${uid}}`);
+        console.log(`Changing password for uid ${uid}`);
 
         const userIndex = userData.findIndex(user => user.uid === uid);
         if (userIndex === -1) {
@@ -368,7 +428,6 @@ async function changeUserPassword(uid, oldPassword, newPassword) {
 
         try {
             await saveToUserDatabase();
-            console.log(`Password changed successfully`);
             resolve({success: true, password: newPassword});
         } catch (err) {
             reject(new Error("Error saving updated user password\n" + err));
@@ -398,30 +457,30 @@ async function changeUserEmail(uid, newEmail) {
     });
 }
 
-async function createNewUser(username, password, email, phoneNum) {
+async function createNewUser(userUid, username, password, email, phoneNum) {
     return new Promise(async (resolve, reject) => {
         console.log(`Creating new user with username ${username}...`);
 
         // Check if username is already taken
         const existingUser = await searchUser(username);
         if (existingUser) {
-            reject(new Error(`Username ${username} is already taken`));
+            return reject(new Error(`Username ${username} is already taken`));
         }
 
         // Validate phone number
         if (!phoneNum.match(/^[4-9]\d{7}$/)) {
-            reject(new Error('Invalid phone number format. Must be 8 digits and start with 4-9.'));
+            return reject(new Error('Invalid phone number format. Must be 8 digits and start with 4-9.'));
         }
 
         // Validate email (basic validation)
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!email.match(emailRegex)) {
-            reject(new Error('Invalid email format, email should contains "@"'));
+            return reject(new Error('Invalid email format, email should contain "@"'));
         }
 
         // Create new user object
         const newUser = {
-            uid: uuid(), // Generate a unique ID
+            uid: userUid,
             username: username,
             password: password, // Note: In a real application, you should hash the password
             email: email,
@@ -442,7 +501,6 @@ async function createNewUser(username, password, email, phoneNum) {
             userData.pop();
             reject(new Error("Unable to save new user data\n" + err));
         }
-
     });
 }
 
@@ -485,6 +543,19 @@ async function checkCredentials(username, password) {
     }
 }
 
+async function fetchUserInfo(uid) {
+    return new Promise(async (resolve, reject) => {
+        console.log("Fetching user info...");
+        const user = userData.find(user => user.uid === uid);
+        if (!user) {
+            reject(new Error(`User with UID ${uid} not found`));
+        } else {
+            resolve({success: true, userName: user.username, phoneNumber: user.phoneNum, email: user.email});
+        }
+
+    });
+}
+
 // Replace the module.exports at the end of the file with this:
 
 export {
@@ -496,6 +567,7 @@ export {
     changeUserPassword,
     changeUserEmail,
     createNewUser,
+    checkIfVoted,
     voteForOptions,
     getVoteStatistics,
     removeVoteEntry,
@@ -507,5 +579,9 @@ export {
     saveToVoteDatabase,
     saveToVoteRecordDatabase,
     rearrangeVoteJSONEntry,
-    getVoteData
+    getVoteData,
+    getVoteById,
+    getVotedOption,
+    getVoteAuthor,
+    fetchUserInfo
 };
