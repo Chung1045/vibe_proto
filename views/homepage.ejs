@@ -1,44 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Young+Serif&display=swap" rel="stylesheet">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&family=Young+Serif&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Young+Serif&display=swap" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&family=Young+Serif&display=swap"
+          rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script
+            src="https://code.jquery.com/jquery-3.7.1.js"
+            integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+            crossorigin="anonymous"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vibe| The most security and enagaging online voting system</title>
+    <title>Vibe</title>
     <style>
+
+        header {
+            font-family: "Young Serif", serif;
+            margin-left: 10px;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #fbfbfb;
+        }
+
+        #brand-introduce-div {
+            margin-top: 20%;
+            margin-left: 10%;
+            z-index: 1;
+            display: flex;
+        }
+
+        #brand-image-showcase img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #brand-feature-showcase-div {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: stretch;
+            padding: 10px;
+            gap: 20px;
+        }
+
+        #brand-feature-showcase-div > div {
+            flex: 1 1 200px;
+            max-width: 200px;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            background-color: #f4f4f4;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
+            justify-content: center;
+            align-items: center;
         }
-        header {
-            font-family: 'Young Serif', serif;
-            background-color: #606060;
-            color: white;
-            padding: 20px;
-            text-align: left;
+
+        #brand-feature-showcase-div i {
+            font-size: 2em;
+            margin-bottom: 10px;
         }
-        main {
-            font-family: 'Inter Tight', sans-serif;
-            flex: 1;
-            padding: 20px;
-            text-align: left;
+
+
+        #brand-feature-title {
+            font-family: "Young Serif", serif;
         }
-        footer {
-            font-family: 'Inter Tight', sans-serif;
-            background-color: #333;
-            color: white;
-            text-align: center;
-            padding: 10px 0;
-        }
+
         button {
             font-family: 'Inter Tight', sans-serif;
             padding: 10px 20px;
@@ -48,41 +84,93 @@
             cursor: pointer;
             font-size: 16px;
         }
+
         button:hover {
             background-color: #45a049;
         }
+
         @media (max-width: 600px) {
             header, footer {
                 font-size: 14px;
             }
+
             button {
                 width: 100%;
             }
+
+            #brand-introduce-div {
+                margin-left: 10%;
+                margin-right: 10%;
+                transition: 0.3s;
+            }
+
+            #brand-feature-showcase-div {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            #brand-feature-showcase-div > div {
+                max-width: 100%;
+                height: 100px;
+                width: 100%;
+                margin-bottom: 20px;
+                transition: 0.3s;
+            }
         }
+
+        #reason-to-choose-title-h2 {
+            text-align: center;
+            margin-top: 50px;
+            margin-bottom: 30px;
+            background: linear-gradient(to right, #f0f0f0, #ffffff, #f0f0f0);
+            padding: 15px 0;
+            border-radius: 8px;
+        }
+
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>Welcome to Vibe</h1>
-        <h3>Online Voting System</h3>
-    </header>
+<header>
+    <h1>Vibe</h1>
+</header>
 
-    <main>
-        <h2>Features</h2>
-        <h3>Security</h3><p>Encrypted communication, secure authentication, and tamper-evident audit trails work together to create a trustworthy and reliable voting system.</p>
-        <h3>Engagement</h3><p>Making the voting process as accessible and user-friendly as possible. Thought and effort have been put into creating an intuitive interface that guides voters through the process step-by-step, with clear instructions and helpful information at every stage.</p>
-        <button id="alertButton">Start by Login</button>
-    </main>
+<div id="brand-introduce-div">
+    <div>
+        <h1 id="brand-feature-title">Smart, Simple, Voting</h1>
+        <p>Transform your vote, backed by robust security, made more discoverable</p>
+        <button id="try-button">Try out now</button>
+    </div>
+</div>
 
-    <footer>
-        <p>&copy; 2024 S350F Vibe</p>
-    </footer>
+<h2 id="reason-to-choose-title-h2">Why choose Vibe?</h2>
 
-    <script>
-        document.getElementById('alertButton').addEventListener('click', function() {
-            alert('Button was clicked!');
+<div id="brand-feature-showcase-div">
+    <div>
+        <i class="bi bi-person-heart"></i>
+        <h2>Easy to use</h2>
+    </div>
+
+    <div>
+        <i class="bi bi-database-fill-lock"></i>
+        <h2>Privacy, secured</h2>
+    </div>
+
+    <div>
+        <i class="bi bi-globe"></i>
+        <h2>Wider audience</h2>
+    </div>
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#try-button").click(function () {
+            window.location.href = "/login";
         });
-    </script>
+    });
+</script>
+
+
 </body>
 </html>

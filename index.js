@@ -81,6 +81,10 @@ app.get("/settings", requireAuth, (req, res) => {
     res.render("settings");
 });
 
+app.get("/index", (req, res) => {
+    res.render("homepage");
+});
+
 app.post("/api/user/check-credentials", async (req, res) => {
     if (req.session.authenticated) {
         console.log("User already authenticated");
