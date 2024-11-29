@@ -38,17 +38,40 @@
         }
 
         #brand-introduce-div {
-            margin-top: 20%;
             margin-left: 10%;
             z-index: 1;
             display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+
+        #brand-image-showcase {
+            flex: 1;
+            max-width: 50%;
+        }
+
+        #brand-image-showcase img {
+            max-width: 90%;
+            height: auto;
+        }
+
+        @media (max-width: 768px) {
+            #brand-introduce-div {
+                flex-direction: column;
+                margin-right: 10%;
+                gap: 20px;
+            }
+
+            #brand-image-showcase {
+                max-width: 100%;
+                order: -1; /* This will make the image appear above the text on small screens */
+            }
         }
 
         #brand-image-showcase img {
             max-width: 100%;
             height: auto;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         #brand-feature-showcase-div {
@@ -132,8 +155,6 @@
 
         #reason-to-choose-title-h2 {
             text-align: center;
-            margin-top: 50px;
-            margin-bottom: 30px;
             background: linear-gradient(to right, #f0f0f0, #d6d6d6, #f0f0f0);
             padding: 15px 0;
             border-radius: 8px;
@@ -152,6 +173,9 @@
         <h1 id="brand-feature-title">Smart, Simple, Voting</h1>
         <p>Transform your vote, backed by robust security, made more discoverable</p>
         <button id="try-button">Try out now</button>
+    </div>
+    <div id="brand-image-showcase">
+        <img src="/images/src/showcase_devices.png" alt="Vibe on multiple devices">
     </div>
 </div>
 
