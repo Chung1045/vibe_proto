@@ -46,7 +46,7 @@ For computers that do not have git installed, install [here](https://git-scm.com
 1. To set up, clone the repository to your computer using git
 
     ```
-    git clone 
+    git clone https://github.com/Chung1045/vibe_proto.git
     ```
 
 2. Open the cloned folder in command line and install all required dependencies
