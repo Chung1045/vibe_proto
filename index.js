@@ -40,7 +40,7 @@ const requireAuth = (req, res, next) => {
 };
 
 app.get("/", (req, res) => {
-    res.redirect("/login");
+    res.render("homepage");
 });
 
 app.get("/dashboard", requireAuth, async (req, res) => {
@@ -81,8 +81,8 @@ app.get("/settings", requireAuth, (req, res) => {
     res.render("settings");
 });
 
-app.get("/index", (req, res) => {
-    res.render("homepage");
+app.get("/index", requireAuth, (req, res) => {
+    res.render("index");
 });
 
 app.post("/api/user/check-credentials", async (req, res) => {

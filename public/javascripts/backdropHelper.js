@@ -1,5 +1,5 @@
 let imageURL;
-const ACCESS_KEY =''; // fill in your own unsplash access key
+const ACCESS_KEY = process.env.UNSPLASH_API_KEY || ""; // fill in your own unsplash access key
 
 async function fetchUnsplashBackground() {
     if (imageURL) {
